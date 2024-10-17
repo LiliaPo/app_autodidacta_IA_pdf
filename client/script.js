@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const testDiv = document.getElementById('test');
     const evaluarBtn = document.getElementById('evaluar');
     const resultadoDiv = document.getElementById('resultado');
+    const resumenDiv = document.getElementById('resumen');
 
     let dificultadSeleccionada = localStorage.getItem('dificultad') || 'fácil';
 
@@ -92,5 +93,49 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             localStorage.setItem('progreso', JSON.stringify(progreso));
         });
+    }
+
+    // Código para generar resúmenes
+    const generarResumenBtn = document.querySelector('button[onclick="location.href=\'resumen.html\'"]');
+    if (generarResumenBtn) {
+        generarResumenBtn.onclick = (e) => {
+            e.preventDefault();
+            const tema = temaInput.value;
+            if (tema) {
+                localStorage.setItem('tema', tema);
+                window.location.href = 'resumen.html';
+            } else {
+                alert('Por favor, introduce un tema antes de generar el resumen.');
+            }
+        };
+    }
+
+    // Si estamos en la página de resumen, generamos el resumen automáticamente
+    if (window.location.pathname.includes('resumen.html')) {
+        const tema = localStorage.getItem('tema');
+        if (tema) {
+            generarResumen(tema);
+        } else {
+            alert('No se ha especificado un tema. Volviendo a la página principal.');
+            window.location.href = 'index.html';
+        }
+    }
+
+    async function generarResumen(tema) {
+        try {
+            const response = await fetch('/resumen', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tema })
+            });
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            resumenDiv.innerHTML = `<h2>Resumen de ${tema}</h2><p>${data.resumen}</p>`;
+        } catch (error) {
+            console.error('Error al generar el resumen:', error);
+            alert('Hubo un error al generar el resumen: ' + error.message);
+        }
     }
 });

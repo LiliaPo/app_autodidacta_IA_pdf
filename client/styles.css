@@ -79,21 +79,25 @@ li {
 }
 
 #opciones {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;  /* Cambiado a 1 columna */
+    gap: 10px;
     margin-top: 20px;
 }
 
 .opcion {
-    margin: 5px 0;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     cursor: pointer;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s;
+    width: 100%;  /* Asegura que el botón ocupe todo el ancho */
+    text-align: left;  /* Alinea el texto a la izquierda */
 }
 
 .opcion:hover {
-    background-color: #f0f0f0;
+    background-color: #e9ecef;
 }
 
 .opcion.correcta {
@@ -108,11 +112,40 @@ li {
     color: #721c24;
 }
 
-#siguiente-pregunta {
+#siguiente {
     margin-top: 20px;
+    display: block;
+    width: 100%;
 }
 
 #resultado {
     margin-top: 20px;
     font-weight: bold;
+    text-align: center;
+}
+
+.pregunta {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.opciones {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.opciones label {
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.opciones label:hover {
+    background-color: #f0f0f0;
 }
