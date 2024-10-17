@@ -3,29 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicación de Estudio</title>
+    <title>App Autodidacta</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="app">
-        <h1>Aplicación de Estudio</h1>
-        <div id="tema-input">
-            <input type="text" id="tema" placeholder="Introduce un tema">
-            <button id="obtener-resumen">Obtener Resumen</button>
+        <h1>App Autodidacta</h1>
+        <input type="text" id="tema" placeholder="Introduce un tema">
+        <button onclick="location.href='resumen.html'">Generar Resumen</button>
+        <button onclick="location.href='test.html'">Generar Test</button>
+        <div id="dificultad">
+            <button class="dificultad-btn" data-dificultad="fácil">Fácil</button>
+            <button class="dificultad-btn" data-dificultad="medio">Medio</button>
+            <button class="dificultad-btn" data-dificultad="difícil">Difícil</button>
         </div>
-        <div id="resumen"></div>
-        <div id="test-options" style="display: none;">
-            <h2>Generar Test</h2>
-            <select id="dificultad">
-                <option value="fácil">Fácil</option>
-                <option value="medio">Medio</option>
-                <option value="difícil">Difícil</option>
-            </select>
-            <button id="generar-test">Generar Test</button>
-        </div>
-        <div id="test"></div>
-        <button id="evaluar" style="display: none;">Evaluar</button>
-        <div id="resultado"></div>
+        <button onclick="location.href='progreso.html'">Ver Progreso</button>
     </div>
     <script src="script.js"></script>
 </body>

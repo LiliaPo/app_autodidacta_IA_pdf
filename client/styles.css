@@ -17,6 +17,7 @@ body {
 
 h1 {
     color: #333;
+    text-align: center;
 }
 
 input, select, button {
@@ -30,15 +31,35 @@ button {
     color: white;
     border: none;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 button:hover {
     background-color: #45a049;
 }
 
-#resumen, #test, #resultado {
+#dificultad {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.dificultad-btn {
+    width: 30%;
+}
+
+#resumen, #test, #resultado, #progreso {
     margin-top: 20px;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
 }
