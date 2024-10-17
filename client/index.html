@@ -10,14 +10,19 @@
     <div id="app">
         <h1>App Autodidacta</h1>
         <input type="text" id="tema" placeholder="Introduce un tema">
-        <button onclick="location.href='resumen.html'">Generar Resumen</button>
-        <button onclick="location.href='test.html'">Generar Test</button>
         <div id="dificultad">
-            <button class="dificultad-btn" data-dificultad="fácil">Fácil</button>
-            <button class="dificultad-btn" data-dificultad="medio">Medio</button>
-            <button class="dificultad-btn" data-dificultad="difícil">Difícil</button>
+            <button class="dificultad-btn facil" data-dificultad="fácil">Fácil</button>
+            <button class="dificultad-btn medio" data-dificultad="medio">Medio</button>
+            <button class="dificultad-btn dificil" data-dificultad="difícil">Difícil</button>
         </div>
+        <button onclick="location.href='resumen.html'">Generar Resumen</button>
+        <button id="generar-test">Generar Test</button>
         <button onclick="location.href='progreso.html'">Ver Progreso</button>
+    </div>
+    <div id="test-container" style="display: none;">
+        <div id="test"></div>
+        <button id="evaluar" style="display: none;">Evaluar</button>
+        <div id="resultado"></div>
     </div>
     <script src="script.js"></script>
 </body>

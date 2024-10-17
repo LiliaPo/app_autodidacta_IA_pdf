@@ -35,7 +35,7 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    opacity: 0.8;
 }
 
 #dificultad {
@@ -46,6 +46,20 @@ button:hover {
 
 .dificultad-btn {
     width: 30%;
+    color: #333;
+    font-weight: bold;
+}
+
+.dificultad-btn.facil {
+    background-color: #FFB3BA; /* Rosa pastel */
+}
+
+.dificultad-btn.medio {
+    background-color: #BAFFC9; /* Verde pastel */
+}
+
+.dificultad-btn.dificil {
+    background-color: #BAE1FF; /* Azul pastel */
 }
 
 #resumen, #test, #resultado, #progreso {
@@ -62,4 +76,43 @@ ul {
 
 li {
     margin-bottom: 10px;
+}
+
+#opciones {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.opcion {
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.opcion:hover {
+    background-color: #f0f0f0;
+}
+
+.opcion.correcta {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.opcion.incorrecta {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+#siguiente-pregunta {
+    margin-top: 20px;
+}
+
+#resultado {
+    margin-top: 20px;
+    font-weight: bold;
 }

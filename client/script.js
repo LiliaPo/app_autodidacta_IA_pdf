@@ -1,16 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     const temaInput = document.getElementById('tema');
-    const resumenDiv = document.getElementById('resumen');
+    const testContainer = document.getElementById('test-container');
     const testDiv = document.getElementById('test');
     const evaluarBtn = document.getElementById('evaluar');
     const resultadoDiv = document.getElementById('resultado');
-    const progresoDiv = document.getElementById('progreso');
+
+    let dificultadSeleccionada = 'fácil'; // Dificultad por defecto
 
     // Guardar tema y dificultad en localStorage
     const dificultadBtns = document.querySelectorAll('.dificultad-btn');
     dificultadBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            localStorage.setItem('dificultad', btn.dataset.dificultad);
+            dificultadSeleccionada = btn.dataset.dificultad;
+            localStorage.setItem('dificultad', dificultadSeleccionada);
+            dificultadBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
         });
     });
 
@@ -20,47 +24,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Funcionalidad para la página de resumen
-    if (resumenDiv) {
-        const tema = localStorage.getItem('tema');
-        if (tema) {
-            obtenerResumen(tema);
-        }
-    }
-
-    // Funcionalidad para la página de test
-    if (testDiv) {
-        const tema = localStorage.getItem('tema');
-        const dificultad = localStorage.getItem('dificultad');
-        if (tema && dificultad) {
-            generarTest(tema, dificultad);
-        }
-    }
-
-    // Funcionalidad para la página de progreso
-    if (progresoDiv) {
-        mostrarProgreso();
-    }
-
-    async function obtenerResumen(tema) {
-        const response = await fetch('/resumen', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tema })
+    const generarTestBtn = document.getElementById('generar-test');
+    if (generarTestBtn) {
+        generarTestBtn.addEventListener('click', () => {
+            const tema = temaInput.value;
+            if (tema) {
+                generarTest(tema, dificultadSeleccionada);
+            } else {
+                alert('Por favor, introduce un tema antes de generar el test.');
+            }
         });
-        const data = await response.json();
-        resumenDiv.innerHTML = `<h2>Resumen de ${tema}</h2><p>${data.resumen}</p>`;
     }
 
     async function generarTest(tema, dificultad) {
-        const response = await fetch('/test', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tema, dificultad })
-        });
-        const data = await response.json();
-        testDiv.innerHTML = `<h2>Test de ${tema} (${dificultad})</h2>${data.test}`;
-        evaluarBtn.style.display = 'block';
+        try {
+            const response = await fetch('/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tema, dificultad })
+            });
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            testDiv.innerHTML = `<h2>Test de ${tema} (${dificultad})</h2>${data.test}`;
+            testContainer.style.display = 'block';
+            evaluarBtn.style.display = 'block';
+        } catch (error) {
+            console.error('Error al generar el test:', error);
+            alert('Hubo un error al generar el test: ' + error.message);
+        }
     }
 
     if (evaluarBtn) {
@@ -88,31 +81,4 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('progreso', JSON.stringify(progreso));
         });
     }
-
-    function mostrarProgreso() {
-        const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');
-        if (progreso.length === 0) {
-            progresoDiv.innerHTML = '<p>Aún no has realizado ningún test.</p>';
-        } else {
-            let html = '<ul>';
-            progreso.forEach(p => {
-                html += `<li>Tema: ${p.tema}, Dificultad: ${p.dificultad}, Resultado: ${p.porcentaje.toFixed(2)}%</li>`;
-            });
-            html += '</ul>';
-            progresoDiv.innerHTML = html;
-        }
-    }
 });
-
-/*
-fetch('https://api.groq.io/tu_endpoint', {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer TU_API_KEY`,
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.error('Error:', error));
-*/
