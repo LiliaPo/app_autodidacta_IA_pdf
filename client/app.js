@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('generar-resumen').addEventListener('click', () => this.generarResumen());
             document.getElementById('generar-test').addEventListener('click', () => this.generarTest());
             document.getElementById('ver-progreso').addEventListener('click', () => this.showPage('progreso'));
-            document.getElementById('evaluar').addEventListener('click', () => this.evaluarTest());
             document.querySelectorAll('.volver').forEach(btn => {
                 btn.addEventListener('click', () => this.showPage('home'));
             });
@@ -64,28 +63,126 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ tema, dificultad })
                 });
                 const data = await response.json();
-                document.getElementById('test').innerHTML = data.test;
-                document.getElementById('evaluar').style.display = 'block';
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                if (!data.test) {
+                    throw new Error('No se recibieron datos del test');
+                }
+                console.log('Datos del test recibidos:', data); // Para depuración
+                this.preguntas = this.parsearPreguntas(data.test);
+                if (this.preguntas.length === 0) {
+                    throw new Error('No se pudieron parsear las preguntas del test');
+                }
+                this.preguntaActual = 0;
+                this.respuestasCorrectas = 0;
+                this.mostrarPregunta();
                 this.showPage('test');
             } catch (error) {
                 console.error('Error al generar el test:', error);
                 alert('Hubo un error al generar el test: ' + error.message);
             }
         },
-        evaluarTest: function() {
-            const preguntas = document.querySelectorAll('#test li');
-            let correctas = 0;
-            preguntas.forEach(pregunta => {
-                const opciones = pregunta.querySelectorAll('input[type="radio"]');
-                const seleccionada = Array.from(opciones).find(opcion => opcion.checked);
-                if (seleccionada && seleccionada.value === 'correcta') {
-                    correctas++;
+        parsearPreguntas: function(textoTest) {
+            if (!textoTest) {
+                console.error('El texto del test está vacío o es undefined');
+                return [];
+            }
+            console.log('Texto del test recibido:', textoTest); // Para depuración
+
+            const preguntasTexto = textoTest.split(/Pregunta \d+:/g).filter(texto => texto.trim() !== '');
+            console.log('Preguntas separadas:', preguntasTexto); // Para depuración
+
+            const preguntas = preguntasTexto.map((preguntaTexto, index) => {
+                const lineas = preguntaTexto.trim().split('\n');
+                console.log(`Pregunta ${index + 1} líneas:`, lineas); // Para depuración
+
+                if (lineas.length < 6) {
+                    console.error(`Formato de pregunta incorrecto para la pregunta ${index + 1}:`, preguntaTexto);
+                    return null;
+                }
+
+                const pregunta = `Pregunta ${index + 1}: ${lineas[0].trim()}`;
+                const opciones = lineas.slice(1, 5).map(opcion => opcion.trim());
+                const respuestaCorrecta = lineas[5].split(':')[1]?.trim() || '';
+
+                // Asegurarse de que hay exactamente 4 opciones
+                if (opciones.length !== 4) {
+                    console.error(`La pregunta ${index + 1} no tiene 4 opciones:`, opciones);
+                    return null;
+                }
+
+                return { pregunta, opciones, respuestaCorrecta };
+            }).filter(pregunta => pregunta !== null);
+            
+            console.log('Preguntas parseadas:', preguntas); // Para depuración
+            
+            if (preguntas.length === 0) {
+                throw new Error('No se pudo parsear ninguna pregunta válida del test');
+            }
+            
+            return preguntas;
+        },
+        mostrarPregunta: function() {
+            const testDiv = document.getElementById('test');
+            if (this.preguntaActual < this.preguntas.length) {
+                const pregunta = this.preguntas[this.preguntaActual];
+                testDiv.innerHTML = `
+                    <h3>${pregunta.pregunta}</h3>
+                    <div class="opciones">
+                        ${pregunta.opciones.map((opcion, index) => `
+                            <button class="opcion" data-index="${index}">${opcion}</button>
+                        `).join('')}
+                    </div>
+                    <button id="siguiente" style="display: none;">Siguiente Pregunta</button>
+                `;
+                document.querySelectorAll('.opcion').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.seleccionarRespuesta(e));
+                });
+                document.getElementById('siguiente').addEventListener('click', () => this.siguientePregunta());
+            } else {
+                this.mostrarResultado();
+            }
+        },
+        seleccionarRespuesta: function(event) {
+            const opcionSeleccionada = event.target;
+            const pregunta = this.preguntas[this.preguntaActual];
+            const opcionCorrecta = pregunta.opciones.findIndex(opcion => 
+                opcion.startsWith(pregunta.respuestaCorrecta)
+            );
+
+            document.querySelectorAll('.opcion').forEach(btn => {
+                btn.disabled = true;
+                if (btn === opcionSeleccionada) {
+                    btn.classList.add(btn.dataset.index == opcionCorrecta ? 'correcta' : 'incorrecta');
+                }
+                if (btn.dataset.index == opcionCorrecta) {
+                    btn.classList.add('correcta');
                 }
             });
-            const total = preguntas.length;
-            const porcentaje = (correctas / total) * 100;
-            document.getElementById('resultado').innerHTML = `<p>Has acertado ${correctas} de ${total} preguntas (${porcentaje.toFixed(2)}%)</p>`;
-            
+
+            if (opcionSeleccionada.dataset.index == opcionCorrecta) {
+                this.respuestasCorrectas++;
+            }
+
+            document.getElementById('siguiente').style.display = 'block';
+        },
+        siguientePregunta: function() {
+            this.preguntaActual++;
+            this.mostrarPregunta();
+        },
+        mostrarResultado: function() {
+            const testDiv = document.getElementById('test');
+            const total = this.preguntas.length;
+            const porcentaje = (this.respuestasCorrectas / total) * 100;
+            testDiv.innerHTML = `
+                <h2>Test completado</h2>
+                <p>Has acertado ${this.respuestasCorrectas} de ${total} preguntas (${porcentaje.toFixed(2)}%)</p>
+                <button class="volver">Volver a Inicio</button>
+            `;
+            document.querySelector('.volver').addEventListener('click', () => this.showPage('home'));
+
+            // Guardar progreso
             const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');
             progreso.push({
                 tema: localStorage.getItem('tema'),
@@ -95,8 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('progreso', JSON.stringify(progreso));
         },
         mostrarProgreso: function() {
-            const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');
             const progresoDiv = document.getElementById('progreso');
+            const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');
             if (progreso.length === 0) {
                 progresoDiv.innerHTML = '<p>Aún no has realizado ningún test.</p>';
             } else {

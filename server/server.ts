@@ -40,7 +40,7 @@ const testPrompt = ChatPromptTemplate.fromPromptMessages([
   ),
   HumanMessagePromptTemplate.fromTemplate(
     'Crea un examen tipo test de {dificultad} dificultad sobre {tema}. ' +
-    'Genera 5 preguntas con 4 opciones cada una, donde solo una es correcta. ' +
+    'Genera 10 preguntas con 4 opciones cada una, donde solo una es correcta. ' +
     'Usa el siguiente formato para cada pregunta:\n' +
     'Pregunta X: [texto de la pregunta]\n' +
     'a) [opción a]\n' +
