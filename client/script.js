@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const evaluarBtn = document.getElementById('evaluar');
     const resultadoDiv = document.getElementById('resultado');
 
-    let dificultadSeleccionada = 'fácil'; // Dificultad por defecto
+    let dificultadSeleccionada = localStorage.getItem('dificultad') || 'fácil';
 
     // Guardar tema y dificultad en localStorage
     const dificultadBtns = document.querySelectorAll('.dificultad-btn');
@@ -29,11 +29,24 @@ document.addEventListener('DOMContentLoaded', () => {
         generarTestBtn.addEventListener('click', () => {
             const tema = temaInput.value;
             if (tema) {
-                generarTest(tema, dificultadSeleccionada);
+                localStorage.setItem('tema', tema);
+                window.location.href = 'test.html';
             } else {
                 alert('Por favor, introduce un tema antes de generar el test.');
             }
         });
+    }
+
+    // Si estamos en la página de test, generamos el test automáticamente
+    if (window.location.pathname.includes('test.html')) {
+        const tema = localStorage.getItem('tema');
+        const dificultad = localStorage.getItem('dificultad');
+        if (tema && dificultad) {
+            generarTest(tema, dificultad);
+        } else {
+            alert('No se ha especificado un tema o dificultad. Volviendo a la página principal.');
+            window.location.href = 'index.html';
+        }
     }
 
     async function generarTest(tema, dificultad) {
@@ -48,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.error);
             }
             testDiv.innerHTML = `<h2>Test de ${tema} (${dificultad})</h2>${data.test}`;
-            testContainer.style.display = 'block';
             evaluarBtn.style.display = 'block';
         } catch (error) {
             console.error('Error al generar el test:', error);
