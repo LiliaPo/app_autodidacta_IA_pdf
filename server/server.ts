@@ -54,20 +54,8 @@ const testPrompt = ChatPromptTemplate.fromPromptMessages([
 const resumenChain = new LLMChain({ llm, prompt: resumenPrompt });
 const testChain = new LLMChain({ llm, prompt: testPrompt });
 
-app.get('/', (req: Request, res: Response) => {
+app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));
-});
-
-app.get('/resumen', (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../client/resumen.html'));
-});
-
-app.get('/test', (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../client/test.html'));
-});
-
-app.get('/progreso', (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../client/progreso.html'));
 });
 
 app.post('/resumen', async (req: Request, res: Response) => {

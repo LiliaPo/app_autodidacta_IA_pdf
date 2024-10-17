@@ -9,16 +9,35 @@
 <body>
     <div id="app">
         <h1>App Autodidacta</h1>
-        <input type="text" id="tema" placeholder="Introduce un tema">
-        <div id="dificultad">
-            <button class="dificultad-btn facil" data-dificultad="fácil">Fácil</button>
-            <button class="dificultad-btn medio" data-dificultad="medio">Medio</button>
-            <button class="dificultad-btn dificil" data-dificultad="difícil">Difícil</button>
+        <div id="home-page">
+            <input type="text" id="tema" placeholder="Introduce un tema">
+            <div id="dificultad">
+                <button class="dificultad-btn facil" data-dificultad="fácil">Fácil</button>
+                <button class="dificultad-btn medio" data-dificultad="medio">Medio</button>
+                <button class="dificultad-btn dificil" data-dificultad="difícil">Difícil</button>
+            </div>
+            <button id="generar-resumen">Generar Resumen</button>
+            <button id="generar-test">Generar Test</button>
+            <button id="ver-progreso">Ver Progreso</button>
         </div>
-        <button onclick="location.href='resumen.html'">Generar Resumen</button>
-        <button id="generar-test">Generar Test</button>
-        <button onclick="location.href='progreso.html'">Ver Progreso</button>
+        <div id="resumen-page" style="display: none;">
+            <h2>Resumen</h2>
+            <div id="resumen"></div>
+            <button class="volver">Volver a Inicio</button>
+        </div>
+        <div id="test-page" style="display: none;">
+            <h2>Test</h2>
+            <div id="test"></div>
+            <button id="evaluar" style="display: none;">Evaluar</button>
+            <div id="resultado"></div>
+            <button class="volver">Volver a Inicio</button>
+        </div>
+        <div id="progreso-page" style="display: none;">
+            <h2>Tu Progreso</h2>
+            <div id="progreso"></div>
+            <button class="volver">Volver a Inicio</button>
+        </div>
     </div>
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
