@@ -8,6 +8,7 @@ const express_1 = __importDefault(require("express"));
 const chains_1 = require("langchain/chains");
 const groq_1 = require("@langchain/groq");
 const prompts_1 = require("@langchain/core/prompts");
+const path_1 = __importDefault(require("path"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = 3000;
@@ -29,11 +30,20 @@ const resumenPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
 const testPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un experto en crear exámenes tipo test sobre diversos temas.'),
     prompts_1.HumanMessagePromptTemplate.fromTemplate('Crea un examen tipo test de {dificultad} dificultad sobre {tema}. ' +
-        'Genera 5 preguntas con 4 opciones cada una, donde solo una es correcta. ' +
-        'Asegúrate de indicar cuál es la respuesta correcta para cada pregunta.')
+        'Genera 10 preguntas con 4 opciones cada una, donde solo una es correcta. ' +
+        'Usa el siguiente formato para cada pregunta:\n' +
+        'Pregunta X: [texto de la pregunta]\n' +
+        'a) [opción a]\n' +
+        'b) [opción b]\n' +
+        'c) [opción c]\n' +
+        'd) [opción d]\n' +
+        'Respuesta correcta: [letra de la respuesta correcta]\n\n')
 ]);
 const resumenChain = new chains_1.LLMChain({ llm, prompt: resumenPrompt });
 const testChain = new chains_1.LLMChain({ llm, prompt: testPrompt });
+app.get('*', (req, res) => {
+    res.sendFile(path_1.default.join(__dirname, '../client/index.html'));
+});
 app.post('/resumen', async (req, res) => {
     try {
         const { tema } = req.body;

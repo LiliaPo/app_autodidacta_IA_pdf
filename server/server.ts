@@ -22,15 +22,15 @@ console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY.substring(0, 5) + '...');
 
 const llm = new ChatGroq({
   apiKey: process.env.GROQ_API_KEY,
-  modelName: 'mixtral-8x7b-32768'
+  modelName: 'llama-3.1-70b-versatile'
 });
 
 const resumenPrompt = ChatPromptTemplate.fromPromptMessages([
   SystemMessagePromptTemplate.fromTemplate(
-    'Eres un asistente útil que genera resúmenes concisos sobre diversos temas.'
+    'Eres un asistente útil que genera informes detallados sobre diversos temas.'
   ),
   HumanMessagePromptTemplate.fromTemplate(
-    'Genera un resumen conciso sobre el tema: {tema}'
+    'Genera un informe detallado sobre el tema y finaliza con dos urls de referencia: {tema}'
   )
 ]);
 
