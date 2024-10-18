@@ -158,14 +158,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mostrarResultado: function() {
             const testDiv = document.getElementById('test');
+            const resultadoDiv = document.getElementById('resultado');
             const total = this.preguntas.length;
             const porcentaje = (this.respuestasCorrectas / total) * 100;
             testDiv.innerHTML = `
                 <h2>Test completado</h2>
                 <p>Has acertado ${this.respuestasCorrectas} de ${total} preguntas (${porcentaje.toFixed(2)}%)</p>
-                <button class="volver">Volver a Inicio</button>
             `;
-            document.querySelector('.volver').addEventListener('click', () => this.showPage('home'));
+            
+            // Eliminamos el botón "Volver a Inicio" de aquí
 
             // Guardar progreso
             const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');

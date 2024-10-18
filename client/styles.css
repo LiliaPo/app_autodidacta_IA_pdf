@@ -120,15 +120,15 @@ li {
 }
 
 .opcion.correcta {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-    color: #155724; /* Verde oscuro para respuestas correctas */
+    background-color: #529c63;
+    border-color: #529c63;
+    color: #103f1b; /* Verde oscuro para respuestas correctas */
 }
 
 .opcion.incorrecta {
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    color: #721c24; /* Rojo oscuro para respuestas incorrectas */
+    background-color: #eca1a7;
+    border-color: #eca1a7;
+    color: #55141a; /* Rojo oscuro para respuestas incorrectas */
 }
 
 #siguiente {

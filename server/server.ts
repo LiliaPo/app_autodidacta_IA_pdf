@@ -22,16 +22,26 @@ console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY.substring(0, 5) + '...');
 
 const llm = new ChatGroq({
   apiKey: process.env.GROQ_API_KEY,
-  modelName: 'llama-3.1-70b-versatile'
-});
+  modelName: 'llama-3.1-70b-versatile',
+  maxTokens: 1200,
+} as any  // Ajusta el valor según las capacidades del modelo
+);
 
 const resumenPrompt = ChatPromptTemplate.fromPromptMessages([
   SystemMessagePromptTemplate.fromTemplate(
-    'Eres un asistente útil que genera informes detallados sobre diversos temas.'
+     'Eres un asistente educativo especializado en crear resúmenes adaptados a diferentes niveles educativos.'
   ),
   HumanMessagePromptTemplate.fromTemplate(
-    'Genera un informe detallado sobre el tema y añade dos urls de referencia: {tema}'
+    'Genera un resumen sobre el tema: {tema} y añade al final del resumen dos urls de referencia: {tema}. ' +
+    'La dificultad solicitada es: {dificultad}. ' +
+    'IMPORTANTE: Adapta el resumen estrictamente según estas pautas:\n' +
+    '- Si la dificultad es "fácil": Proporciona un resumen muy corto y simple de entre 8-15 frases adecuado para nivel de primaria. Usa vocabulario básico y conceptos generales que un niño pueda entender fácilmente.\n' +
+    '- Si la dificultad es "medio": Ofrece un resumen más detallado de entre 15-25 frases apropiado para nivel de instituto. Incluye algunos términos técnicos y explicaciones más complejas.\n' +
+    '- Si la dificultad es "difícil": Elabora un resumen extenso y técnico de entre 35-60 frases con información de nivel universitario. Utiliza terminología especializada, conceptos avanzados y, si es relevante, menciona teorías o investigaciones recientes en el campo.\n' +
+    'Asegúrate de que la longitud, complejidad y nivel educativo del resumen se ajusten estrictamente al nivel de {dificultad} solicitado. ' +
+    'Al final del resumen añade 1-2 urls de referencia.'
   )
+
 ]);
 
 const testPrompt = ChatPromptTemplate.fromPromptMessages([

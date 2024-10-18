@@ -39,3 +39,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 });
+
+function mostrarResultado() {
+    const testDiv = document.getElementById('test');
+    const resultadoDiv = document.getElementById('resultado');
+    const total = this.preguntas.length;
+    const porcentaje = (this.respuestasCorrectas / total) * 100;
+    resultadoDiv.innerHTML = `
+        <h2>Test completado</h2>
+        <p>Has acertado ${this.respuestasCorrectas} de ${total} preguntas (${porcentaje.toFixed(2)}%)</p>
+        <button class="volver">Volver a Inicio</button>
+    `;
+    document.querySelector('#resultado .volver').addEventListener('click', () => showPage('home'));
+
+    // Guardar progreso
+    const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');
+    progreso.push({
+        tema: localStorage.getItem('tema'),
+        dificultad: localStorage.getItem('dificultad'),
+        porcentaje: porcentaje
+    });
+    localStorage.setItem('progreso', JSON.stringify(progreso));
+}
+
+// Función showPage (asumiendo que existe en algún lugar del código)
+function showPage(pageId) {
+    // Implementación de la función showPage
+}
