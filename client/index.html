@@ -11,14 +11,18 @@
         <h1>App Autodidacta</h1>
         <div id="home-page">
             <input type="text" id="tema" placeholder="Introduce un tema">
-            <div id="dificultad">
-                <button class="dificultad-btn facil" data-dificultad="fácil">Fácil</button>
-                <button class="dificultad-btn medio" data-dificultad="medio">Medio</button>
-                <button class="dificultad-btn dificil" data-dificultad="difícil">Difícil</button>
+            <div id="buttons-container">
+                <div id="dificultad">
+                    <button class="dificultad-btn facil" data-dificultad="fácil">Fácil</button>
+                    <button class="dificultad-btn medio" data-dificultad="medio">Medio</button>
+                    <button class="dificultad-btn dificil" data-dificultad="difícil">Difícil</button>
+                </div>
+                <div id="acciones">
+                    <button id="generar-resumen">Generar Resumen</button>
+                    <button id="generar-test">Generar Test</button>
+                    <button id="ver-progreso">Ver Progreso</button>
+                </div>
             </div>
-            <button id="generar-resumen">Generar Resumen</button>
-            <button id="generar-test">Generar Test</button>
-            <button id="ver-progreso">Ver Progreso</button>
         </div>
         <div id="resumen-page" style="display: none;">
             <h2>Resumen</h2>

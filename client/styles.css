@@ -5,19 +5,23 @@ body {
     padding: 20px;
     background-color: #f4f4f4;
     color: #333; /* Color de texto base para todo el body */
+    background-image: url('assets/inicioImagen.png'); /* Imagen de fondo */
+    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+    background-position: center; /* Centra la imagen */
 }
 
 #app {
-    max-width: 800px;
+    max-width: 33%;
     margin: 0 auto;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.7); /* Fondo blanco con 20% de transparencia */
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 h1, h2, h3 {
-    color: #333; /* Asegura que los títulos sean oscuros */
+    color: #1a4b10; /* Asegura que los títulos sean oscuros */
+    text-align: center;
 }
 
 input, select, button {
@@ -38,28 +42,41 @@ button:hover {
     opacity: 0.8;
 }
 
+#buttons-container {
+    display: flex;
+    justify-content: space-around;
+}
+
 #dificultad {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     margin: 10px 0;
 }
 
+#acciones {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin: 10px 0;
+}
+
 .dificultad-btn {
-    width: 30%;
+    width: 100%;
     color: #333;
     font-weight: bold;
 }
 
 .dificultad-btn.facil {
-    background-color: #FFB3BA; /* Rosa pastel */
+    background-color: #92fd77;
 }
 
 .dificultad-btn.medio {
-    background-color: #BAFFC9; /* Verde pastel */
+    background-color: #fdec52;
 }
 
 .dificultad-btn.dificil {
-    background-color: #BAE1FF; /* Azul pastel */
+    background-color: #fd6060;
 }
 
 #resumen, #test, #resultado, #progreso {
@@ -150,4 +167,9 @@ li {
 
 .opciones label:hover {
     background-color: #f0f0f0;
+}
+
+#home-page input#tema {
+    width: 100%; /* Asegura que el input ocupe todo el ancho del contenedor */
+    box-sizing: border-box; /* Incluye el padding en el ancho total */
 }
