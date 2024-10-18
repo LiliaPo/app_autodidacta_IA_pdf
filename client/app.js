@@ -1,10 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const app = {
         pages: ['home', 'resumen', 'test', 'progreso'],
+        preguntas: [],
+        preguntaActual: 0,
+        respuestasCorrectas: 0,
+
         init: function() {
             this.bindEvents();
             this.showPage('home');
         },
+
         bindEvents: function() {
             document.querySelectorAll('.dificultad-btn').forEach(btn => {
                 btn.addEventListener('click', () => this.setDificultad(btn.dataset.dificultad));
@@ -17,38 +22,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.addEventListener('click', () => this.showPage('home'));
             });
         },
+
         showPage: function(pageId) {
             this.pages.forEach(page => {
                 document.getElementById(`${page}-page`).style.display = page === pageId ? 'block' : 'none';
             });
             if (pageId === 'progreso') this.mostrarProgreso();
         },
+
         setDificultad: function(dificultad) {
             localStorage.setItem('dificultad', dificultad);
             document.querySelectorAll('.dificultad-btn').forEach(btn => {
                 btn.classList.toggle('selected', btn.dataset.dificultad === dificultad);
             });
         },
+
         generarResumen: async function() {
             const tema = localStorage.getItem('tema');
-            if (!tema) {
-                alert('Por favor, introduce un tema antes de generar el resumen.');
+            const dificultad = localStorage.getItem('dificultad');
+            if (!tema || !dificultad) {
+                alert('Por favor, introduce un tema y selecciona una dificultad antes de generar el resumen.');
                 return;
             }
             try {
                 const response = await fetch('/resumen', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tema })
+                    body: JSON.stringify({ tema, dificultad })
                 });
                 const data = await response.json();
-                document.getElementById('resumen').innerHTML = `<p>${data.resumen}</p>`;
+                document.getElementById('resumen').innerHTML = `
+                    <h3>Resumen de ${tema} (Dificultad: ${dificultad})</h3>
+                    <p>${data.resumen}</p>
+                `;
                 this.showPage('resumen');
             } catch (error) {
                 console.error('Error al generar el resumen:', error);
                 alert('Hubo un error al generar el resumen: ' + error.message);
             }
         },
+
         generarTest: async function() {
             const tema = localStorage.getItem('tema');
             const dificultad = localStorage.getItem('dificultad');
@@ -66,14 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                if (!data.test) {
-                    throw new Error('No se recibieron datos del test');
-                }
-                console.log('Datos del test recibidos:', data); // Para depuración
                 this.preguntas = this.parsearPreguntas(data.test);
-                if (this.preguntas.length === 0) {
-                    throw new Error('No se pudieron parsear las preguntas del test');
-                }
+                
                 this.preguntaActual = 0;
                 this.respuestasCorrectas = 0;
                 this.mostrarPregunta();
@@ -83,46 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Hubo un error al generar el test: ' + error.message);
             }
         },
+
         parsearPreguntas: function(textoTest) {
-            if (!textoTest) {
-                console.error('El texto del test está vacío o es undefined');
-                return [];
-            }
-            console.log('Texto del test recibido:', textoTest); // Para depuración
-
             const preguntasTexto = textoTest.split(/Pregunta \d+:/g).filter(texto => texto.trim() !== '');
-            console.log('Preguntas separadas:', preguntasTexto); // Para depuración
-
-            const preguntas = preguntasTexto.map((preguntaTexto, index) => {
+            return preguntasTexto.map((preguntaTexto, index) => {
                 const lineas = preguntaTexto.trim().split('\n');
-                console.log(`Pregunta ${index + 1} líneas:`, lineas); // Para depuración
-
-                if (lineas.length < 6) {
-                    console.error(`Formato de pregunta incorrecto para la pregunta ${index + 1}:`, preguntaTexto);
-                    return null;
-                }
-
-                const pregunta = `Pregunta ${index + 1}: ${lineas[0].trim()}`;
-                const opciones = lineas.slice(1, 5).map(opcion => opcion.trim());
-                const respuestaCorrecta = lineas[5].split(':')[1]?.trim() || '';
-
-                // Asegurarse de que hay exactamente 4 opciones
-                if (opciones.length !== 4) {
-                    console.error(`La pregunta ${index + 1} no tiene 4 opciones:`, opciones);
-                    return null;
-                }
-
-                return { pregunta, opciones, respuestaCorrecta };
-            }).filter(pregunta => pregunta !== null);
-            
-            console.log('Preguntas parseadas:', preguntas); // Para depuración
-            
-            if (preguntas.length === 0) {
-                throw new Error('No se pudo parsear ninguna pregunta válida del test');
-            }
-            
-            return preguntas;
+                return {
+                    pregunta: `Pregunta ${index + 1}: ${lineas[0].trim()}`,
+                    opciones: lineas.slice(1, 5).map(opcion => opcion.trim()),
+                    respuestaCorrecta: lineas[5].split(':')[1]?.trim() || ''
+                };
+            });
         },
+
         mostrarPregunta: function() {
             const testDiv = document.getElementById('test');
             if (this.preguntaActual < this.preguntas.length) {
@@ -134,16 +114,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="opcion" data-index="${index}">${opcion}</button>
                         `).join('')}
                     </div>
-                    <button id="siguiente" style="display: none;">Siguiente Pregunta</button>
                 `;
                 document.querySelectorAll('.opcion').forEach(btn => {
                     btn.addEventListener('click', (e) => this.seleccionarRespuesta(e));
                 });
-                document.getElementById('siguiente').addEventListener('click', () => this.siguientePregunta());
             } else {
                 this.mostrarResultado();
             }
         },
+
         seleccionarRespuesta: function(event) {
             const opcionSeleccionada = event.target;
             const pregunta = this.preguntas[this.preguntaActual];
@@ -165,12 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.respuestasCorrectas++;
             }
 
-            document.getElementById('siguiente').style.display = 'block';
+            const testDiv = document.getElementById('test');
+            testDiv.innerHTML += `
+                <button id="siguiente">Siguiente Pregunta</button>
+            `;
+            document.getElementById('siguiente').addEventListener('click', () => this.siguientePregunta());
         },
+
         siguientePregunta: function() {
             this.preguntaActual++;
             this.mostrarPregunta();
         },
+
         mostrarResultado: function() {
             const testDiv = document.getElementById('test');
             const total = this.preguntas.length;
@@ -191,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             localStorage.setItem('progreso', JSON.stringify(progreso));
         },
+
         mostrarProgreso: function() {
             const progresoDiv = document.getElementById('progreso');
             const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');

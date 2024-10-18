@@ -17,10 +17,16 @@ const llm = new ChatGroq({
 
 const resumenPrompt = ChatPromptTemplate.fromPromptMessages([
   SystemMessagePromptTemplate.fromTemplate(
-    'Eres un asistente útil que genera resúmenes concisos sobre diversos temas.'
+    'Eres un asistente educativo especializado en crear resúmenes adaptados a diferentes niveles educativos.'
   ),
   HumanMessagePromptTemplate.fromTemplate(
-    'Genera un resumen conciso sobre el tema: {tema}'
+    'Genera un resumen sobre el tema: {tema}. ' +
+    'La dificultad solicitada es: {dificultad}. ' +
+    'IMPORTANTE: Adapta el resumen estrictamente según estas pautas:\n' +
+    '- Si la dificultad es "fácil": Proporciona un resumen muy corto y simple (máximo 3 frases) adecuado para nivel de primaria. Usa vocabulario básico y conceptos generales que un niño pueda entender fácilmente.\n' +
+    '- Si la dificultad es "medio": Ofrece un resumen más detallado (5-7 frases) apropiado para nivel de instituto. Incluye algunos términos técnicos básicos y conceptos más específicos, explicándolos brevemente.\n' +
+    '- Si la dificultad es "difícil": Elabora un resumen extenso y técnico (8-10 frases) con información de nivel universitario. Utiliza terminología especializada, conceptos avanzados y, si es relevante, menciona teorías o investigaciones recientes en el campo.\n' +
+    'Asegúrate de que la longitud, complejidad y nivel educativo del resumen se ajusten estrictamente al nivel de dificultad solicitado.'
   )
 ]);
 
@@ -45,9 +51,23 @@ const resumenChain = new LLMChain({ llm, prompt: resumenPrompt });
 const testChain = new LLMChain({ llm, prompt: testPrompt });
 
 app.post('/resumen', async (req, res) => {
-  const { tema } = req.body;
-  const resultado = await resumenChain.call({ tema });
-  res.json({ resumen: resultado.text });
+  try {
+    const { tema, dificultad } = req.body;
+    console.log('Generando resumen para:', tema, 'con dificultad:', dificultad);
+    const resultado = await resumenChain.call({ tema, dificultad });
+    console.log('Resultado del resumen:', resultado);
+    if (resultado.text) {
+      res.json({ resumen: resultado.text });
+    } else {
+      throw new Error('No se generó texto para el resumen');
+    }
+  } catch (error) {
+    console.error('Error al generar el resumen:', error);
+    res.status(500).json({ 
+      error: 'Error al generar el resumen', 
+      details: error.message
+    });
+  }
 });
 
 app.post('/test', async (req, res) => {
