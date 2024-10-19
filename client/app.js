@@ -180,6 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mostrarProgreso: function() {
             const progresoDiv = document.getElementById('progreso');
+            if (!progresoDiv) {
+                console.error('No se encontró el elemento con id "progreso".');
+                return;  // Salimos de la función si no encontramos el elemento
+            }
+            
             const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');
             if (progreso.length === 0) {
                 progresoDiv.innerHTML = '<p>Aún no has realizado ningún test.</p>';
