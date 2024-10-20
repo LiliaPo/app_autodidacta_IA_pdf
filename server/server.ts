@@ -30,7 +30,7 @@ const resumenPrompt = ChatPromptTemplate.fromPromptMessages([
     'Eres un asistente útil que genera informes detallados sobre diversos temas.'
   ),
   HumanMessagePromptTemplate.fromTemplate(
-    'Genera un informe detallado sobre el tema y añade dos urls de referencia: {tema}'
+    'Genera un informe detallado de 1000 palabras sobre el tema, separadas en párrafos, y añade dos urls de referencia: {tema}'
   )
 ]);
 
@@ -61,16 +61,16 @@ app.get('*', (req: Request, res: Response) => {
 app.post('/resumen', async (req: Request, res: Response) => {
   try {
     const { tema } = req.body;
-    console.log('Generando resumen para:', tema);
+    //console.log('Generando resumen para:', tema);
     const resultado = await resumenChain.call({ tema });
-    console.log('Resultado del resumen:', resultado);
+    //console.log('Resultado del resumen:', resultado);
     if (resultado.text) {
       res.json({ resumen: resultado.text });
     } else {
       throw new Error('No se generó texto para el resumen');
     }
   } catch (error: unknown) {
-    console.error('Error al generar el resumen:', error);
+    //console.error('Error al generar el resumen:', error);
     if (error instanceof Error) {
       res.status(500).json({ 
         error: 'Error al generar el resumen', 
@@ -88,16 +88,16 @@ app.post('/resumen', async (req: Request, res: Response) => {
 app.post('/test', async (req: Request, res: Response) => {
   try {
     const { tema, dificultad } = req.body;
-    console.log('Generando test para:', tema, 'con dificultad:', dificultad);
+    //console.log('Generando test para:', tema, 'con dificultad:', dificultad);
     const resultado = await testChain.call({ tema, dificultad });
-    console.log('Resultado del test:', resultado);
+    //console.log('Resultado del test:', resultado);
     if (resultado.text) {
       res.json({ test: resultado.text });
     } else {
       throw new Error('No se generó texto para el test');
     }
   } catch (error: unknown) {
-    console.error('Error al generar el test:', error);
+    //console.error('Error al generar el test:', error);
     if (error instanceof Error) {
       res.status(500).json({ 
         error: 'Error al generar el test', 

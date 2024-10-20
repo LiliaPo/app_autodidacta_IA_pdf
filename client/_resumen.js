@@ -1,3 +1,5 @@
+import { marked } from 'marked'; // Importar la biblioteca marked
+
 document.addEventListener('DOMContentLoaded', () => {
     const resumenDiv = document.getElementById('resumen');
     const tema = localStorage.getItem('tema');
@@ -20,7 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.error) {
                 throw new Error(data.error);
             }
-            resumenDiv.innerHTML = `<h2>Resumen de ${tema}</h2><p>${data.resumen}</p>`;
+            // Convertir el texto Markdown a HTML
+            //const textMarkdown = "#Título\nTexto en **negrita**"
+            const htmlContent = marked(data.resumen); // Convertir Markdown a HTML
+            resumenDiv.innerHTML = htmlContent; // Insertar el HTML en el div
         } catch (error) {
             console.error('Error al generar el resumen:', error);
             alert('Hubo un error al generar el resumen: ' + error.message);

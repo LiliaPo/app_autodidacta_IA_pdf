@@ -21,11 +21,11 @@ if (!process.env.GROQ_API_KEY) {
 console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY.substring(0, 5) + '...');
 const llm = new groq_1.ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
-    modelName: 'mixtral-8x7b-32768'
+    modelName: 'llama-3.1-70b-versatile'
 });
 const resumenPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
-    prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un asistente útil que genera resúmenes concisos sobre diversos temas.'),
-    prompts_1.HumanMessagePromptTemplate.fromTemplate('Genera un resumen conciso sobre el tema: {tema}')
+    prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un asistente útil que genera informes detallados sobre diversos temas.'),
+    prompts_1.HumanMessagePromptTemplate.fromTemplate('Genera un informe detallado de 1000 palabras sobre el tema y añade dos urls de referencia: {tema}')
 ]);
 const testPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un experto en crear exámenes tipo test sobre diversos temas.'),
@@ -47,9 +47,9 @@ app.get('*', (req, res) => {
 app.post('/resumen', async (req, res) => {
     try {
         const { tema } = req.body;
-        console.log('Generando resumen para:', tema);
+        //console.log('Generando resumen para:', tema);
         const resultado = await resumenChain.call({ tema });
-        console.log('Resultado del resumen:', resultado);
+        //console.log('Resultado del resumen:', resultado);
         if (resultado.text) {
             res.json({ resumen: resultado.text });
         }
@@ -58,7 +58,7 @@ app.post('/resumen', async (req, res) => {
         }
     }
     catch (error) {
-        console.error('Error al generar el resumen:', error);
+        //console.error('Error al generar el resumen:', error);
         if (error instanceof Error) {
             res.status(500).json({
                 error: 'Error al generar el resumen',
@@ -76,9 +76,9 @@ app.post('/resumen', async (req, res) => {
 app.post('/test', async (req, res) => {
     try {
         const { tema, dificultad } = req.body;
-        console.log('Generando test para:', tema, 'con dificultad:', dificultad);
+        //console.log('Generando test para:', tema, 'con dificultad:', dificultad);
         const resultado = await testChain.call({ tema, dificultad });
-        console.log('Resultado del test:', resultado);
+        //console.log('Resultado del test:', resultado);
         if (resultado.text) {
             res.json({ test: resultado.text });
         }
@@ -87,7 +87,7 @@ app.post('/test', async (req, res) => {
         }
     }
     catch (error) {
-        console.error('Error al generar el test:', error);
+        //console.error('Error al generar el test:', error);
         if (error instanceof Error) {
             res.status(500).json({
                 error: 'Error al generar el test',
