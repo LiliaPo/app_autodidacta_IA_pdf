@@ -173,3 +173,18 @@ li {
     width: 100%; /* Asegura que el input ocupe todo el ancho del contenedor */
     box-sizing: border-box; /* Incluye el padding en el ancho total */
 }
+
+.loader {
+    border: 16px solid #f3f3f3; /* Color de fondo */
+    border-top: 16px solid #3498db; /* Color del reloj de arena */
+    border-radius: 50%;
+    width: 60px; /* Tamaño del indicador */
+    height: 60px; /* Tamaño del indicador */
+    animation: spin 2s linear infinite; /* Animación de giro */
+    margin: auto; /* Centrar el indicador */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

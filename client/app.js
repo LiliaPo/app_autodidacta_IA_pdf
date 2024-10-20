@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Por favor, introduce un tema antes de generar el resumen.');
                 return;
             }
+            // Mostrar indicador de carga
+            const resumenDiv = document.getElementById('resumen');
+            resumenDiv.innerHTML = '<div class="loader"></div>'; // Indicador de carga
+            this.showPage('resumen');
+
             try {
                 const response = await fetch('/resumen', {
                     method: 'POST',
@@ -42,8 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ tema })
                 });
                 const data = await response.json();
-                document.getElementById('resumen').innerHTML = `<p>${data.resumen}</p>`;
-                this.showPage('resumen');
+                resumenDiv.innerHTML = `<p>${data.resumen}</p>`; // Renderizar como markdown
+                //this.showPage('resumen');
             } catch (error) {
                 console.error('Error al generar el resumen:', error);
                 alert('Hubo un error al generar el resumen: ' + error.message);
