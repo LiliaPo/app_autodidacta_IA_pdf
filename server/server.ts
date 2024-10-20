@@ -31,7 +31,7 @@ const resumenPrompt = ChatPromptTemplate.fromPromptMessages([
     'Eres un asistente útil que genera informes detallados sobre diversos temas.'
   ),
   HumanMessagePromptTemplate.fromTemplate(
-    'Genera un informe detallado de 1000 palabras sobre el tema y añade dos urls de referencia: {tema}'
+    'Genera un informe detallado sobre el tema y añade dos urls de referencia: {tema}'
   )
 ]);
 

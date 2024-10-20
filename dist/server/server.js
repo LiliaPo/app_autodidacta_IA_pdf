@@ -26,7 +26,7 @@ const llm = new groq_1.ChatGroq({
 });
 const resumenPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un asistente útil que genera informes detallados sobre diversos temas.'),
-    prompts_1.HumanMessagePromptTemplate.fromTemplate('Genera un informe detallado de 1000 palabras sobre el tema y añade dos urls de referencia: {tema}')
+    prompts_1.HumanMessagePromptTemplate.fromTemplate('Genera un informe detallado sobre el tema y añade dos urls de referencia: {tema}')
 ]);
 const testPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un experto en crear exámenes tipo test sobre diversos temas.'),
