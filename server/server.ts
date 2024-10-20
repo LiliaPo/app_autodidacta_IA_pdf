@@ -23,7 +23,7 @@ console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY.substring(0, 5) + '...');
 const llm = new ChatGroq({
   apiKey: process.env.GROQ_API_KEY,
   modelName: 'llama-3.1-70b-versatile',
-
+  
 });
 
 const resumenPrompt = ChatPromptTemplate.fromPromptMessages([

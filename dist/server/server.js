@@ -32,14 +32,14 @@ const testPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un experto en crear exámenes tipo test sobre diversos temas.'),
     prompts_1.HumanMessagePromptTemplate.fromTemplate('Crea un examen tipo test de {dificultad} dificultad sobre {tema}. ' +
         'Genera 10 preguntas con 4 opciones cada una, donde solo una es correcta. ' +
+        'Cada vez que generas un test, genera un nuevo examen con preguntas diferentes. '+
         'Usa el siguiente formato para cada pregunta:\n' +
         'Pregunta X: [texto de la pregunta]\n' +
         'a) [opción a]\n' +
         'b) [opción b]\n' +
         'c) [opción c]\n' +
         'd) [opción d]\n' +
-        'Respuesta correcta: [letra de la respuesta correcta]\n\n') +
-        'Cada vez que generas un test, genera un nuevo examen con preguntas diferentes. '
+        'Respuesta correcta: [letra de la respuesta correcta]\n\n')
 ]);
 const resumenChain = new chains_1.LLMChain({ llm, prompt: resumenPrompt });
 const testChain = new chains_1.LLMChain({ llm, prompt: testPrompt });
