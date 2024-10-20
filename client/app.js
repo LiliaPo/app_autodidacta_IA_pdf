@@ -216,16 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Añadir el botón de reiniciar progreso
                 html += '<button id="reiniciar-progreso">Reiniciar Progreso</button>';
                 progresoDiv.innerHTML = html;
-                
-                // Añadir el event listener al botón
-                document.getElementById('reiniciar-progreso').addEventListener('click', () => this.reiniciarProgreso());
-            }
-        },
-        reiniciarProgreso: function() {
-            if (confirm('¿Estás seguro de que quieres reiniciar todo tu progreso? Esta acción no se puede deshacer.')) {
-                localStorage.removeItem('progreso');
-                this.mostrarProgreso(); // Actualizar la vista de progreso
-                alert('Tu progreso ha sido reiniciado.');
             }
         }
     };

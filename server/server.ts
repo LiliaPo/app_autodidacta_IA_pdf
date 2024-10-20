@@ -22,7 +22,8 @@ console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY.substring(0, 5) + '...');
 
 const llm = new ChatGroq({
   apiKey: process.env.GROQ_API_KEY,
-  modelName: 'mixtral-8x7b-32768',
+  // modelName: 'mixtral-8x7b-32768',
+  modelName: 'llama-3.1-70b-versatile',
   
 });
 
@@ -31,7 +32,8 @@ const resumenPrompt = ChatPromptTemplate.fromPromptMessages([
     'Eres un asistente útil que genera informes detallados sobre diversos temas.'
   ),
   HumanMessagePromptTemplate.fromTemplate(
-    'Genera un informe detallado sobre el tema y añade dos urls de referencia: {tema}'
+    'Genera un informe extenso sobre el tema y añade dos urls de referencia: {tema}' +
+    'No utilices fórmulas de incio ni despedida'
   )
 ]);
 
@@ -49,7 +51,8 @@ const testPrompt = ChatPromptTemplate.fromPromptMessages([
     'c) [opción c]\n' +
     'd) [opción d]\n' +
     'Respuesta correcta: [letra de la respuesta correcta]\n\n' +
-    'Cada vez que generas un test, genera un nuevo examen con preguntas diferentes. '
+    'Cada vez que generas un test, genera un nuevo examen con preguntas diferentes. ' +
+    'No utilices fórmulas de incio ni despedida'
   )
 ]);
 

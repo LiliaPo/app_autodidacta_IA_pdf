@@ -21,19 +21,22 @@ if (!process.env.GROQ_API_KEY) {
 console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY.substring(0, 5) + '...');
 const llm = new groq_1.ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
-    modelName: 'mixtral-8x7b-32768'
-    // modelName: 'llama-3.1-70b-versatile',
-    // maxTokens: 20000
+    // modelName: 'mixtral-8x7b-32768'
+    modelName: 'llama-3.1-70b-versatile',
+    maxTokens: 20000
 });
 const resumenPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un asistente útil que genera informes detallados sobre diversos temas.'),
-    prompts_1.HumanMessagePromptTemplate.fromTemplate('Genera un informe detallado sobre el tema y añade dos urls de referencia: {tema}')
+    prompts_1.HumanMessagePromptTemplate.fromTemplate('Genera un informe extenso sobre el tema y añade dos urls de referencia: {tema}' +
+        'No utilices fórmulas de incio ni despedida'
+    )
 ]);
 const testPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un experto en crear exámenes tipo test sobre diversos temas.'),
     prompts_1.HumanMessagePromptTemplate.fromTemplate('Crea un examen tipo test de {dificultad} dificultad sobre {tema}. ' +
         'Genera 10 preguntas con 4 opciones cada una, donde solo una es correcta. ' +
         'Cada vez que generas un test, genera un nuevo examen con preguntas diferentes. '+
+        'No utilices fórmulas de incio ni despedida' +
         'Usa el siguiente formato para cada pregunta:\n' +
         'Pregunta X: [texto de la pregunta]\n' +
         'a) [opción a]\n' +
