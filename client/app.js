@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.volver').forEach(btn => {
                 btn.addEventListener('click', () => this.showPage('home'));
             });
+            // Añadir este nuevo event listener
+            document.getElementById('reiniciar-progreso').addEventListener('click', () => this.reiniciarProgreso());
         },
         showPage: function(pageId) {
             this.pages.forEach(page => {
@@ -61,6 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Por favor, introduce un tema y selecciona una dificultad antes de generar el test.');
                 return;
             }
+            
+            // Mostrar indicador de carga
+            const testDiv = document.getElementById('test');
+            testDiv.innerHTML = '<div class="loader"></div>'; // Indicador de carga
+            this.showPage('test');
+
             try {
                 const response = await fetch('/test', {
                     method: 'POST',
@@ -82,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.preguntaActual = 0;
                 this.respuestasCorrectas = 0;
                 this.mostrarPregunta();
-                this.showPage('test');
             } catch (error) {
                 console.error('Error al generar el test:', error);
                 alert('Hubo un error al generar el test: ' + error.message);
@@ -206,7 +213,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     html += `<li>Tema: ${p.tema}, Dificultad: ${p.dificultad}, Resultado: ${p.porcentaje.toFixed(2)}%</li>`;
                 });
                 html += '</ul>';
+                // Añadir el botón de reiniciar progreso
+                html += '<button id="reiniciar-progreso">Reiniciar Progreso</button>';
                 progresoDiv.innerHTML = html;
+                
+                // Añadir el event listener al botón
+                document.getElementById('reiniciar-progreso').addEventListener('click', () => this.reiniciarProgreso());
+            }
+        },
+        reiniciarProgreso: function() {
+            if (confirm('¿Estás seguro de que quieres reiniciar todo tu progreso? Esta acción no se puede deshacer.')) {
+                localStorage.removeItem('progreso');
+                this.mostrarProgreso(); // Actualizar la vista de progreso
+                alert('Tu progreso ha sido reiniciado.');
             }
         }
     };
