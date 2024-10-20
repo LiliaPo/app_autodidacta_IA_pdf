@@ -21,7 +21,8 @@ if (!process.env.GROQ_API_KEY) {
 console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY.substring(0, 5) + '...');
 const llm = new groq_1.ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
-    modelName: 'llama-3.1-70b-versatile'
+    modelName: 'llama-3.1-70b-versatile',
+    maxTokens: 20000
 });
 const resumenPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un asistente útil que genera informes detallados sobre diversos temas.'),
@@ -37,7 +38,8 @@ const testPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
         'b) [opción b]\n' +
         'c) [opción c]\n' +
         'd) [opción d]\n' +
-        'Respuesta correcta: [letra de la respuesta correcta]\n\n')
+        'Respuesta correcta: [letra de la respuesta correcta]\n\n') +
+        'Cada vez que generas un test, genera un nuevo examen con preguntas diferentes. '
 ]);
 const resumenChain = new chains_1.LLMChain({ llm, prompt: resumenPrompt });
 const testChain = new chains_1.LLMChain({ llm, prompt: testPrompt });
