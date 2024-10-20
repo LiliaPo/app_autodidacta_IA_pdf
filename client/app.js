@@ -183,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
             testDiv.innerHTML = `
                 <h2>Test completado</h2>
                 <p>Has acertado ${this.respuestasCorrectas} de ${total} preguntas (${porcentaje.toFixed(2)}%)</p>
-                <button class="volver">Volver a Inicio</button>
             `;
             document.querySelector('.volver').addEventListener('click', () => this.showPage('home'));
 
