@@ -49,8 +49,9 @@ button:hover {
 
 #dificultad {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
     margin: 10px 0;
 }
 
@@ -62,6 +63,7 @@ button:hover {
 }
 
 .dificultad-btn {
+    margin: 10px;
     width: 100%;
     color: #333;
     font-weight: bold;
