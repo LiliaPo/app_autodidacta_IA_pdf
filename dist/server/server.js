@@ -21,8 +21,9 @@ if (!process.env.GROQ_API_KEY) {
 console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY.substring(0, 5) + '...');
 const llm = new groq_1.ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
-    modelName: 'llama-3.1-70b-versatile',
-    maxTokens: 20000
+    modelName: 'mixtral-8x7b-32768'
+    // modelName: 'llama-3.1-70b-versatile',
+    // maxTokens: 20000
 });
 const resumenPrompt = prompts_1.ChatPromptTemplate.fromPromptMessages([
     prompts_1.SystemMessagePromptTemplate.fromTemplate('Eres un asistente útil que genera informes detallados sobre diversos temas.'),
