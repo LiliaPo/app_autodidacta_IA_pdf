@@ -47,8 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ tema })
                 });
                 const data = await response.json();
-                resumenDiv.innerHTML = `<p>${data.resumen}</p>`; // Renderizar como markdown
-                //this.showPage('resumen');
+                // Usar marked para convertir markdown a HTML
+                resumenDiv.innerHTML = marked.parse(data.resumen);
             } catch (error) {
                 console.error('Error al generar el resumen:', error);
                 alert('Hubo un error al generar el resumen: ' + error.message);

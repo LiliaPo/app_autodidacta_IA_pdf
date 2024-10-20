@@ -11,7 +11,7 @@ body {
 }
 
 #app {
-    max-width: 33%;
+    max-width: 50%;
     margin: 0 auto;
     background-color: rgba(255, 255, 255, 0.7); /* Fondo blanco con 20% de transparencia */
     padding: 20px;
@@ -65,6 +65,11 @@ button:hover {
     width: 100%;
     color: #333;
     font-weight: bold;
+}
+
+.dificultad-btn.selected {
+    border: 1px solid #000000;
+    color: white;
 }
 
 .dificultad-btn.facil {
