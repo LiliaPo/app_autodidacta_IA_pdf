@@ -5,6 +5,7 @@ import path from 'path';
 import { config } from './config/config';
 import { connectDB } from './config/database';
 import fileRoutes from './routes/fileRoutes';
+import { generarResumen, generarTest } from './controllers/aiController';
 
 const app = express();
 
@@ -22,6 +23,8 @@ app.use(express.static(path.join(__dirname, '../../frontend/public')));
 
 // Rutas API
 app.use('/api/files', fileRoutes);
+app.post('/api/resumen', generarResumen);
+app.post('/api/test', generarTest);
 
 // Ruta principal - sirve index.html
 app.get('*', (req, res) => {

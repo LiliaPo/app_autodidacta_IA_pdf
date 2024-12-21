@@ -1,3 +1,4 @@
+/* Base */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -21,171 +22,20 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-h1, h2, h3 {
-    color: #333;
-}
-
-input, select, button {
-    margin: 10px 0;
-    padding: 10px;
-    width: 100%;
-}
-
-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    opacity: 0.8;
-}
-
-#dificultad {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-}
-
-.dificultad-btn {
-    width: 30%;
-    color: #333;
-    font-weight: bold;
-}
-
-.dificultad-btn.facil {
-    background-color: #FFB3BA;
-}
-
-.dificultad-btn.medio {
-    background-color: #BAFFC9;
-}
-
-.dificultad-btn.dificil {
-    background-color: #BAE1FF;
-}
-
-#resumen, #test, #resultado, #progreso {
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.8);
-}
-
-.opciones {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.opcion {
-    padding: 10px;
-    text-align: left;
-}
-
-.opcion.correcta {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-    color: #155724;
-}
-
-.opcion.incorrecta {
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    color: #721c24;
-}
-
-#siguiente {
-    margin-top: 20px;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 4px;
-}
-
-/* Contenedor para los botones principales */
-#acciones {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 25px 0;
-}
-
-/* Ajustar el ancho de los botones principales */
-#generar-resumen,
-#generar-test,
-#ver-progreso {
-    width: auto;
-    min-width: 130px;
-    padding: 12px 24px;
-    margin: 0;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+/* Título */
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin: 20px 0 30px;
+    font-weight: 700;
     background: linear-gradient(45deg, #7AA2F7, #89B4FF);
-    color: white;
-    border: none;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
 }
 
-#generar-resumen:hover,
-#generar-test:hover,
-#ver-progreso:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    opacity: 0.9;
-    background: linear-gradient(45deg, #6B8FE4, #7AA2F7);
-}
-
-/* Estilos modernos para los botones de dificultad */
-#dificultad {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 20px 0;
-}
-
-.dificultad-btn {
-    width: auto;
-    min-width: 100px;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.dificultad-btn.facil {
-    background: linear-gradient(45deg, #FFB3BA, #FFD9DC);
-    color: #444;
-}
-
-.dificultad-btn.medio {
-    background: linear-gradient(45deg, #BAFFC9, #D1FFD7);
-    color: #444;
-}
-
-.dificultad-btn.dificil {
-    background: linear-gradient(45deg, #BAE1FF, #D6EDFF);
-    color: #444;
-}
-
-/* Estilo moderno para el input */
+/* Input */
 input[type="text"] {
     width: 95%;
     padding: 12px;
@@ -205,37 +55,130 @@ input[type="text"]:focus {
     width: 97%;
 }
 
-/* Estilos para el botón "volver" y otros botones secundarios */
-.volver, 
-#siguiente {
-    background: linear-gradient(45deg, #7AA2F7, #89B4FF);
-    color: white;
+/* Botones de dificultad */
+#dificultad {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.dificultad-btn {
+    width: auto;
+    min-width: 100px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
     border: none;
-    border-radius: 25px;
+}
+
+.dificultad-btn.facil { background: linear-gradient(45deg, #FFB3BA, #FFD9DC); }
+.dificultad-btn.medio { background: linear-gradient(45deg, #BAFFC9, #D1FFD7); }
+.dificultad-btn.dificil { background: linear-gradient(45deg, #BAE1FF, #D6EDFF); }
+
+.dificultad-btn.selected {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Botones de acción */
+#acciones {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+#generar-resumen,
+#generar-test,
+#ver-progreso,
+.volver,
+#siguiente {
+    width: auto;
+    min-width: 130px;
     padding: 12px 24px;
+    border-radius: 25px;
     font-weight: 600;
+    font-size: 0.95rem;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    background: linear-gradient(45deg, #7AA2F7, #89B4FF);
+    color: white;
+    border: none;
+    cursor: pointer;
+    opacity: 0.9;
 }
 
+#generar-resumen:hover,
+#generar-test:hover,
+#ver-progreso:hover,
 .volver:hover,
 #siguiente:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    opacity: 0.9;
-    background: linear-gradient(45deg, #6B8FE4, #7AA2F7);
+    opacity: 1;
 }
 
-h1 {
-    text-align: center;
-    color: #333;
-    font-size: 2.5rem;
-    margin: 20px 0 30px;
-    font-weight: 700;
-    background: linear-gradient(45deg, #7AA2F7, #89B4FF);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 1px;
+/* Contenedores de contenido */
+#resumen, 
+#test, 
+#resultado, 
+#progreso {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Opciones del test */
+.opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.opcion {
+    padding: 15px;
+    text-align: left;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.opcion.correcta {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.opcion.incorrecta {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Lista de progreso */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+li:hover {
+    transform: translateX(5px);
+    background-color: rgba(255, 255, 255, 0.9);
 }
   
