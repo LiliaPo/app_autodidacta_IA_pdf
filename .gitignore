@@ -1,4 +1,22 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+
+# Environment
 .env
-node_modules
-.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+
+# Upload directory
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db

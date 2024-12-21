@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnify AI </title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Learnify AI </h1>
+        <div id="home-page">
+            <input type="text" id="tema" placeholder="Introduce un tema">
+            <div id="dificultad">
+                <button class="dificultad-btn facil" data-dificultad="fácil">Fácil</button>
+                <button class="dificultad-btn medio" data-dificultad="medio">Medio</button>
+                <button class="dificultad-btn dificil" data-dificultad="difícil">Difícil</button>
+            </div>
+            <div id="acciones">
+                <button id="generar-resumen">Generar Resumen</button>
+                <button id="generar-test">Generar Test</button>
+                <button id="ver-progreso">Ver Progreso</button>
+            </div>
+        </div>
+        <div id="resumen-page" style="display: none;">
+            <h2>Resumen</h2>
+            <div id="resumen"></div>
+            <button class="volver">Volver a Inicio</button>
+        </div>
+        <div id="test-page" style="display: none;">
+            <h2>Test</h2>
+            <div id="test"></div>
+            <div id="resultado"></div>
+            <button class="volver">Volver a Inicio</button>
+        </div>
+        <div id="progreso-page" style="display: none;">
+            <h2>Tu Progreso</h2>
+            <div id="progreso"></div>
+            <button class="volver">Volver a Inicio</button>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>

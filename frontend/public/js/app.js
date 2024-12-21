@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.volver').forEach(btn => {
                 btn.addEventListener('click', () => this.showPage('home'));
             });
-            // Añadir este nuevo event listener
-            document.getElementById('reiniciar-progreso').addEventListener('click', () => this.reiniciarProgreso());
         },
         showPage: function(pageId) {
             this.pages.forEach(page => {
@@ -37,11 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Por favor, introduce un tema antes de generar el resumen.');
                 return;
             }
-            // Mostrar indicador de carga
-            const resumenDiv = document.getElementById('resumen');
-            resumenDiv.innerHTML = '<div class="loader"></div>'; // Indicador de carga
-            this.showPage('resumen');
-
             try {
                 const response = await fetch('/resumen', {
                     method: 'POST',
@@ -49,8 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ tema })
                 });
                 const data = await response.json();
-                // Usar marked para convertir markdown a HTML
-                resumenDiv.innerHTML = marked.parse(data.resumen);
+                document.getElementById('resumen').innerHTML = `<p>${data.resumen}</p>`;
+                this.showPage('resumen');
             } catch (error) {
                 console.error('Error al generar el resumen:', error);
                 alert('Hubo un error al generar el resumen: ' + error.message);
@@ -63,12 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Por favor, introduce un tema y selecciona una dificultad antes de generar el test.');
                 return;
             }
-            
-            // Mostrar indicador de carga
-            const testDiv = document.getElementById('test');
-            testDiv.innerHTML = '<div class="loader"></div>'; // Indicador de carga
-            this.showPage('test');
-
             try {
                 const response = await fetch('/test', {
                     method: 'POST',
@@ -82,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!data.test) {
                     throw new Error('No se recibieron datos del test');
                 }
-                console.log('Datos del test recibidos:', data); // Para depuración
                 this.preguntas = this.parsearPreguntas(data.test);
                 if (this.preguntas.length === 0) {
                     throw new Error('No se pudieron parsear las preguntas del test');
@@ -90,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.preguntaActual = 0;
                 this.respuestasCorrectas = 0;
                 this.mostrarPregunta();
+                this.showPage('test');
             } catch (error) {
                 console.error('Error al generar el test:', error);
                 alert('Hubo un error al generar el test: ' + error.message);
@@ -100,14 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('El texto del test está vacío o es undefined');
                 return [];
             }
-            console.log('Texto del test recibido:', textoTest); // Para depuración
 
             const preguntasTexto = textoTest.split(/Pregunta \d+:/g).filter(texto => texto.trim() !== '');
-            console.log('Preguntas separadas:', preguntasTexto); // Para depuración
 
             const preguntas = preguntasTexto.map((preguntaTexto, index) => {
                 const lineas = preguntaTexto.trim().split('\n');
-                console.log(`Pregunta ${index + 1} líneas:`, lineas); // Para depuración
 
                 if (lineas.length < 6) {
                     console.error(`Formato de pregunta incorrecto para la pregunta ${index + 1}:`, preguntaTexto);
@@ -118,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const opciones = lineas.slice(1, 5).map(opcion => opcion.trim());
                 const respuestaCorrecta = lineas[5].split(':')[1]?.trim() || '';
 
-                // Asegurarse de que hay exactamente 4 opciones
                 if (opciones.length !== 4) {
                     console.error(`La pregunta ${index + 1} no tiene 4 opciones:`, opciones);
                     return null;
@@ -127,14 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return { pregunta, opciones, respuestaCorrecta };
             }).filter(pregunta => pregunta !== null);
             
-            console.log('Preguntas parseadas:', preguntas); // Para depuración
-            
             if (preguntas.length === 0) {
                 throw new Error('No se pudo parsear ninguna pregunta válida del test');
             }
             
             return preguntas;
         },
+
         mostrarPregunta: function() {
             const testDiv = document.getElementById('test');
             if (this.preguntaActual < this.preguntas.length) {
@@ -156,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.mostrarResultado();
             }
         },
+
         seleccionarRespuesta: function(event) {
             const opcionSeleccionada = event.target;
             const pregunta = this.preguntas[this.preguntaActual];
@@ -179,10 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('siguiente').style.display = 'block';
         },
+
         siguientePregunta: function() {
             this.preguntaActual++;
             this.mostrarPregunta();
         },
+
         mostrarResultado: function() {
             const testDiv = document.getElementById('test');
             const total = this.preguntas.length;
@@ -191,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h2>Test completado</h2>
                 <p>Has acertado ${this.respuestasCorrectas} de ${total} preguntas (${porcentaje.toFixed(2)}%)</p>
             `;
-            document.querySelector('.volver').addEventListener('click', () => this.showPage('home'));
 
             // Guardar progreso
             const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');
@@ -202,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             localStorage.setItem('progreso', JSON.stringify(progreso));
         },
+
         mostrarProgreso: function() {
             const progresoDiv = document.getElementById('progreso');
             const progreso = JSON.parse(localStorage.getItem('progreso') || '[]');
@@ -213,8 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     html += `<li>Tema: ${p.tema}, Dificultad: ${p.dificultad}, Resultado: ${p.porcentaje.toFixed(2)}%</li>`;
                 });
                 html += '</ul>';
-                // Añadir el botón de reiniciar progreso
-                html += '<button id="reiniciar-progreso">Reiniciar Progreso</button>';
                 progresoDiv.innerHTML = html;
             }
         }
