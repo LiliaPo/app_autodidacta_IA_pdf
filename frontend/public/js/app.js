@@ -266,11 +266,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('currentDocument', content);
                 localStorage.setItem('currentDocumentId', docId);
                 localStorage.setItem('isDocumentMode', 'true');
+                localStorage.removeItem('tema'); // Limpiar tema anterior
                 
                 // Actualizar el campo de tema
                 const temaInput = document.getElementById('tema');
                 temaInput.value = filename;
-                temaInput.disabled = true; // Deshabilitar el input cuando es un documento
+                temaInput.disabled = true;
                 
                 // Ocultar botones de dificultad
                 document.getElementById('dificultad').style.display = 'none';
@@ -281,18 +282,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Actualizar las funciones
                 window.app.generarResumen = async function() {
-                    const contenido = localStorage.getItem('currentDocument');
                     try {
                         const response = await fetch('/api/resumen', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
-                                tema: contenido,
-                                isDocument: true
+                                tema: localStorage.getItem('currentDocument'), // Usar el contenido del documento
+                                isDocument: true,
+                                filename: filename // Enviar también el nombre del archivo
                             })
                         });
                         const data = await response.json();
-                        document.getElementById('resumen').innerHTML = `<p>${data.resumen}</p>`;
+                        document.getElementById('resumen').innerHTML = `
+                            <h3>Resumen de: ${filename}</h3>
+                            ${data.resumen}
+                        `;
                         this.showPage('resumen');
                     } catch (error) {
                         console.error('Error al generar el resumen:', error);
@@ -301,14 +305,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 window.app.generarTest = async function() {
-                    const contenido = localStorage.getItem('currentDocument');
                     try {
                         const response = await fetch('/api/test', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
-                                tema: contenido,
-                                isDocument: true
+                                tema: localStorage.getItem('currentDocument'), // Usar el contenido del documento
+                                isDocument: true,
+                                filename: filename // Enviar también el nombre del archivo
                             })
                         });
                         const data = await response.json();
