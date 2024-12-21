@@ -71,13 +71,27 @@ export const generarResumen = async (req: Request, res: Response): Promise<void>
 
         const prompt = `Genera un resumen educativo detallado sobre "${tema}". 
         El resumen debe ser estructurado, informativo y fácil de entender.
-        Incluye:
-        - Una introducción general
-        - Conceptos principales
-        - Ejemplos relevantes
-        - Datos importantes
-        Usa formato HTML con etiquetas h3, h4, p, ul, li para estructurar el contenido.`;
 
+         - Si la dificultad es "fácil" (nivel primaria), utiliza un lenguaje sencillo, ejemplos cotidianos y evita tecnicismos.
+         - Si la dificultad es "medio", ofrece una explicación equilibrada, con ejemplos relevantes pero un lenguaje accesible.
+        - Si la dificultad es "difícil" (nivel científico avanzado), utiliza terminología técnica de alto nivel, conceptos complejos, ejemplos matemáticos o teóricos relevantes, y aborda la profundidad del tema de manera rigurosa. 
+              - Incluye ecuaciones, modelos matemáticos, investigaciones de vanguardia o ejemplos especializados en el campo científico. El lenguaje debe estar dirigido a profesionales, estudiantes avanzados o investigadores del área.
+                 El resumen debe incluir:
+          - Una introducción general
+          - Conceptos principales
+          - Ejemplos relevantes
+          - Datos importantes
+
+        Usa formato HTML con etiquetas h3, h4, p, ul, li para estructurar el contenido.
+
+        Al final del resumen, incluye **dos enlaces relevantes** que los usuarios pueden seguir para obtener más información sobre el tema. Los enlaces deben ser a **fuentes confiables o páginas web relacionadas con el tema**, como artículos académicos, blogs especializados, o sitios educativos. Los enlaces deben ayudar a los usuarios a profundizar más en el tema que se trató en el resumen. Los enlaces deben estar en formato HTML.
+
+          Los enlaces deben estar como sigue:
+          1. [Enlace 1: Tema relacionado](URL del enlace 1)
+          2. [Enlace 2: Tema adicional](URL del enlace 2)
+           `;
+
+        
         const systemPrompt = 'Eres un profesor experto que genera resúmenes educativos detallados y bien estructurados.';
         const resumen = await fetchGroqAPI(prompt, systemPrompt);
 
