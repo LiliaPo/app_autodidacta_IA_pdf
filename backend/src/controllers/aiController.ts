@@ -161,7 +161,7 @@ export const generarTest = async (req: Request, res: Response): Promise<void> =>
             - Las preguntas deben ser claras y sin ambigüedades`;
         } else {
             // Mantener el prompt original para temas libres
-            prompt = `Genera un test de opción múltiple sobre "${tema}"...`;
+            prompt = `Genera un test de 10 preguntas de opción múltiple sobre "${tema}"...`;
         }
 
         const systemPrompt = isDocument ?

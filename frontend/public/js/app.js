@@ -304,6 +304,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Archivos subidos correctamente');
                 fileList.innerHTML = '';
                 fileInput.value = '';
+                
+                // Recargar la lista de documentos inmediatamente
+                await loadDocuments();
             } else {
                 throw new Error('Error al subir los archivos');
             }
@@ -464,22 +467,32 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 const documents = await response.json();
                 const documentsListElement = document.getElementById('documents-list');
-                documentsListElement.innerHTML = documents.map(doc => `
-                    <div class="document-item" data-id="${doc._id}">
-                        <span>${doc.filename}</span>
-                        <div class="document-actions">
-                            <button class="document-button study" onclick="studyDocument('${doc._id}')">
-                                Estudiar
-                            </button>
-                            <button class="document-button delete" onclick="deleteDocument('${doc._id}')">
-                                Eliminar
-                            </button>
+                
+                if (documents.length === 0) {
+                    documentsListElement.innerHTML = '<p class="no-documents">No hay documentos subidos</p>';
+                    return;
+                }
+
+                documentsListElement.innerHTML = documents
+                    .sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
+                    .map(doc => `
+                        <div class="document-item" data-id="${doc._id}">
+                            <span>${doc.filename}</span>
+                            <div class="document-actions">
+                                <button class="document-button study" onclick="studyDocument('${doc._id}')">
+                                    Estudiar
+                                </button>
+                                <button class="document-button delete" onclick="deleteDocument('${doc._id}')">
+                                    Eliminar
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `).join('');
             }
         } catch (error) {
             console.error('Error al cargar documentos:', error);
+            document.getElementById('documents-list').innerHTML = 
+                '<p class="error-message">Error al cargar los documentos</p>';
         }
     };
 

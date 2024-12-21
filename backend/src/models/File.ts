@@ -5,7 +5,6 @@ export interface IFile extends Document {
     originalName: string;
     mimetype: string;
     size: number;
-    path: string;
     content: string;
     uploadDate: Date;
 }
@@ -15,7 +14,6 @@ const FileSchema: Schema = new Schema({
     originalName: { type: String, required: true },
     mimetype: { type: String, required: true },
     size: { type: Number, required: true },
-    path: { type: String, required: true },
     content: { 
         type: String, 
         required: true,
