@@ -258,32 +258,37 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 const { content } = await response.json();
                 
-                // Obtener el nombre del archivo para usarlo como tema
+                // Obtener el nombre del archivo
                 const docElement = document.querySelector(`[data-id="${docId}"]`);
                 const filename = docElement.querySelector('span').textContent;
                 
                 // Guardar en localStorage
                 localStorage.setItem('currentDocument', content);
                 localStorage.setItem('currentDocumentId', docId);
+                localStorage.setItem('isDocumentMode', 'true');
                 
-                // Actualizar el campo de tema con el nombre del archivo
+                // Actualizar el campo de tema
                 const temaInput = document.getElementById('tema');
                 temaInput.value = filename;
+                temaInput.disabled = true; // Deshabilitar el input cuando es un documento
                 
-                // Actualizar las funciones del app
+                // Ocultar botones de dificultad
+                document.getElementById('dificultad').style.display = 'none';
+                
+                // Modificar el texto de los botones
+                document.getElementById('generar-resumen').textContent = 'Analizar y Resumir Documento';
+                document.getElementById('generar-test').textContent = 'Crear Test del Documento';
+                
+                // Actualizar las funciones
                 window.app.generarResumen = async function() {
-                    const tema = localStorage.getItem('currentDocument');
-                    if (!tema) {
-                        alert('Por favor, selecciona un documento para estudiar.');
-                        return;
-                    }
+                    const contenido = localStorage.getItem('currentDocument');
                     try {
                         const response = await fetch('/api/resumen', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
-                                tema: tema,
-                                dificultad: localStorage.getItem('dificultad') || 'medio'
+                                tema: contenido,
+                                isDocument: true
                             })
                         });
                         const data = await response.json();
@@ -296,29 +301,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 window.app.generarTest = async function() {
-                    const tema = localStorage.getItem('currentDocument');
-                    const dificultad = localStorage.getItem('dificultad');
-                    if (!tema || !dificultad) {
-                        alert('Por favor, selecciona un documento y una dificultad.');
-                        return;
-                    }
+                    const contenido = localStorage.getItem('currentDocument');
                     try {
                         const response = await fetch('/api/test', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ tema, dificultad })
+                            body: JSON.stringify({ 
+                                tema: contenido,
+                                isDocument: true
+                            })
                         });
                         const data = await response.json();
-                        if (data.error) {
-                            throw new Error(data.error);
-                        }
                         if (!data.test) {
                             throw new Error('No se recibieron datos del test');
                         }
                         this.preguntas = this.parsearPreguntas(data.test);
-                        if (this.preguntas.length === 0) {
-                            throw new Error('No se pudieron parsear las preguntas del test');
-                        }
                         this.preguntaActual = 0;
                         this.respuestasCorrectas = 0;
                         this.mostrarPregunta();
@@ -329,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 };
 
-                alert('Documento seleccionado para estudio. Ahora puedes generar resúmenes o tests sobre su contenido.');
+                alert('Documento seleccionado. Puedes generar un resumen o test sobre su contenido.');
             }
         } catch (error) {
             console.error('Error al cargar contenido:', error);
@@ -386,4 +383,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Iniciar carga de documentos
     window.loadDocuments();
+
+    // Añadir función para resetear la interfaz cuando se vuelve al modo tema libre
+    function resetToFreeMode() {
+        const temaInput = document.getElementById('tema');
+        temaInput.value = '';
+        temaInput.disabled = false;
+        document.getElementById('dificultad').style.display = 'flex';
+        document.getElementById('generar-resumen').textContent = 'Generar Resumen';
+        document.getElementById('generar-test').textContent = 'Generar Test';
+        localStorage.removeItem('currentDocument');
+        localStorage.removeItem('currentDocumentId');
+        localStorage.removeItem('isDocumentMode');
+    }
+
+    // Modificar el evento click de los botones "volver"
+    document.querySelectorAll('.volver').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (localStorage.getItem('isDocumentMode')) {
+                resetToFreeMode();
+            }
+            app.showPage('home');
+        });
+    });
 });
