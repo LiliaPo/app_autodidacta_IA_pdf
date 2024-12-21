@@ -3,6 +3,7 @@ import File from '../models/File';
 import { UploadedFile } from 'express-fileupload';
 import fs from 'fs/promises';
 import path from 'path';
+import { parseDocument } from '../services/documentParser';
 
 export const uploadFiles = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -16,24 +17,24 @@ export const uploadFiles = async (req: Request, res: Response): Promise<void> =>
         const savedFiles = [];
 
         for (const file of uploadedFiles) {
-            // Verificar tipo de archivo
-            if (!file.mimetype.match(/^application\/(pdf|msword|vnd\.openxmlformats|vnd\.ms-excel)|text\/plain/)) {
+            try {
+                // Parsear el contenido del documento
+                const content = await parseDocument(file);
+
+                const fileDoc = await File.create({
+                    filename: file.name,
+                    originalName: file.name,
+                    mimetype: file.mimetype,
+                    size: file.size,
+                    path: path.join(__dirname, '../../uploads', file.name),
+                    content: content // Guardar el contenido parseado
+                });
+
+                savedFiles.push(fileDoc);
+            } catch (error) {
+                console.error(`Error al procesar archivo ${file.name}:`, error);
                 continue;
             }
-
-            // Leer contenido del archivo
-            const content = file.data.toString('utf-8');
-
-            const fileDoc = await File.create({
-                filename: file.name,
-                originalName: file.name,
-                mimetype: file.mimetype,
-                size: file.size,
-                path: path.join(__dirname, '../../uploads', file.name),
-                content: content
-            });
-
-            savedFiles.push(fileDoc);
         }
 
         res.json({

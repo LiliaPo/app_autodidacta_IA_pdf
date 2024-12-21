@@ -16,7 +16,11 @@ const FileSchema: Schema = new Schema({
     mimetype: { type: String, required: true },
     size: { type: Number, required: true },
     path: { type: String, required: true },
-    content: { type: String, required: true },
+    content: { 
+        type: String, 
+        required: true,
+        maxLength: 16777216 // 16MB para documentos grandes
+    },
     uploadDate: { type: Date, default: Date.now }
 });
 

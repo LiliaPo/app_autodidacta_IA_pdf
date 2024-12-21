@@ -11,22 +11,45 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 app.use(fileUpload({
     createParentPath: true,
     limits: { fileSize: config.uploadLimit },
     abortOnLimit: true
 }));
 
-// Servir archivos estáticos
-app.use(express.static(path.join(__dirname, '../../frontend/public')));
-
 // Rutas API
 app.use('/api/files', fileRoutes);
-app.post('/api/resumen', generarResumen);
-app.post('/api/test', generarTest);
 
-// Ruta principal - sirve index.html
+// Rutas específicas para resumen y test
+app.post('/api/resumen', async (req, res) => {
+    try {
+        await generarResumen(req, res);
+    } catch (error) {
+        console.error('Error en ruta /api/resumen:', error);
+        res.status(500).json({ 
+            error: error instanceof Error ? error.message : 'Error interno del servidor',
+            tipo: 'resumen'
+        });
+    }
+});
+
+app.post('/api/test', async (req, res) => {
+    try {
+        await generarTest(req, res);
+    } catch (error) {
+        console.error('Error en ruta /api/test:', error);
+        res.status(500).json({ 
+            error: error instanceof Error ? error.message : 'Error interno del servidor',
+            tipo: 'test'
+        });
+    }
+});
+
+// Servir archivos estáticos - DESPUÉS de las rutas API
+app.use(express.static(path.join(__dirname, '../../frontend/public')));
+
+// Ruta principal - ÚLTIMA ruta
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../frontend/public/index.html'));
 });

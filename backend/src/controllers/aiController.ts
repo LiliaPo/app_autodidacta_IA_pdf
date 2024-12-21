@@ -62,82 +62,116 @@ const fetchGroqAPI = async (prompt: string, systemPrompt: string): Promise<strin
 
 export const generarResumen = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { tema } = req.body;
+        const { tema, isDocument, filename } = req.body;
 
         if (!tema) {
-            res.status(400).json({ error: 'El tema es requerido' });
+            res.status(400).json({ error: 'El contenido es requerido' });
             return;
         }
 
-        const prompt = `Genera un resumen educativo detallado sobre "${tema}". 
-        El resumen debe ser estructurado, informativo y fácil de entender.
+        console.log('Contenido recibido:', tema.substring(0, 200) + '...');
 
-         - Si la dificultad es "fácil" (nivel primaria), utiliza un lenguaje sencillo, ejemplos cotidianos y evita tecnicismos.
-         - Si la dificultad es "medio", ofrece una explicación equilibrada, con ejemplos relevantes pero un lenguaje accesible.
-        - Si la dificultad es "difícil" (nivel científico avanzado), utiliza terminología técnica de alto nivel, conceptos complejos, ejemplos matemáticos o teóricos relevantes, y aborda la profundidad del tema de manera rigurosa. 
-              - Incluye ecuaciones, modelos matemáticos, investigaciones de vanguardia o ejemplos especializados en el campo científico. El lenguaje debe estar dirigido a profesionales, estudiantes avanzados o investigadores del área.
-                 El resumen debe incluir:
-          - Una introducción general
-          - Conceptos principales
-          - Ejemplos relevantes
-          - Datos importantes
+        let prompt;
+        if (isDocument) {
+            prompt = `Analiza el siguiente documento y genera un resumen detallado:
 
-        Usa formato HTML con etiquetas h3, h4, p, ul, li para estructurar el contenido.
+            TÍTULO: ${filename}
+            CONTENIDO:
+            ${tema}
 
-        Al final del resumen, incluye **dos enlaces relevantes** que los usuarios pueden seguir para obtener más información sobre el tema. Los enlaces deben ser a **fuentes confiables o páginas web relacionadas con el tema**, como artículos académicos, blogs especializados, o sitios educativos. Los enlaces deben ayudar a los usuarios a profundizar más en el tema que se trató en el resumen. Los enlaces deben estar en formato HTML.
+            Instrucciones:
+            1. Lee y analiza todo el contenido proporcionado
+            2. Genera un resumen estructurado y completo
+            3. Incluye los puntos principales y conceptos clave
+            4. Mantén el formato y la coherencia del texto
 
-          Los enlaces deben estar como sigue:
-          1. [Enlace 1: Tema relacionado](URL del enlace 1)
-          2. [Enlace 2: Tema adicional](URL del enlace 2)
-           `;
+            El resumen debe incluir:
+            - Una introducción clara
+            - Los puntos principales del documento
+            - Las conclusiones más importantes
+            - Una síntesis final
 
-        
-        const systemPrompt = 'Eres un profesor experto que genera resúmenes educativos detallados y bien estructurados.';
+            Formato requerido:
+            <h3>Introducción</h3>
+            [Introducción al tema]
+
+            <h3>Puntos Principales</h3>
+            [Lista de puntos principales]
+
+            <h3>Conclusiones</h3>
+            [Conclusiones principales]`;
+        } else {
+            // Mantener el prompt original para temas libres
+            prompt = `Genera un resumen educativo detallado sobre "${tema}"...`;
+        }
+
+        const systemPrompt = isDocument ? 
+            'Eres un experto en análisis y resumen de documentos. Tu tarea es crear resúmenes claros, concisos y bien estructurados.' : 
+            'Eres un profesor experto que genera resúmenes educativos.';
+
         const resumen = await fetchGroqAPI(prompt, systemPrompt);
+
+        console.log('Resumen generado:', resumen.substring(0, 200) + '...');
 
         res.json({ resumen });
     } catch (error) {
-        console.error('Error en generarResumen:', error);
-        res.status(500).json({ 
-            error: error instanceof Error ? error.message : 'Error desconocido',
-            tipo: 'resumen'
-        });
+        console.error('Error completo en generarResumen:', error);
+        res.status(500).json({ error: error instanceof Error ? error.message : 'Error desconocido' });
     }
 };
 
 export const generarTest = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { tema, dificultad } = req.body;
+        const { tema, isDocument, filename } = req.body;
 
-        if (!tema || !dificultad) {
-            res.status(400).json({ error: 'El tema y la dificultad son requeridos' });
+        if (!tema) {
+            res.status(400).json({ error: 'El contenido es requerido' });
             return;
         }
 
-        const prompt = `Genera un test de opción múltiple sobre "${tema}" con dificultad "${dificultad}".
-        Si la dificultad es "fácil": preguntas básicas y directas.
-        Si es "medio": preguntas que requieran algo de análisis.
-        Si es "difícil": preguntas que requieran pensamiento crítico y conocimiento profundo.
-        
-        Genera 5 preguntas siguiendo este formato exacto:
-        Pregunta 1: [pregunta]
-        A) [opción]
-        B) [opción]
-        C) [opción]
-        D) [opción]
-        Respuesta: [letra correcta]
-        
-        [Repetir para las 5 preguntas]`;
+        let prompt;
+        if (isDocument) {
+            prompt = `Analiza el siguiente documento y crea un test de comprensión:
 
-        const systemPrompt = 'Eres un profesor experto que genera tests educativos adaptados al nivel de dificultad requerido.';
+            DOCUMENTO: ${filename}
+            CONTENIDO:
+            ${tema}
+
+            Crea un test de 5 preguntas que evalúe la comprensión profunda del documento.
+            Las preguntas deben:
+            1. Evaluar la comprensión de los conceptos clave
+            2. Verificar el entendimiento de las relaciones entre ideas
+            3. Comprobar la asimilación de los puntos principales
+            4. Incluir diferentes niveles de dificultad cognitiva
+
+            FORMATO EXACTO para cada pregunta:
+            Pregunta 1: [Pregunta basada en el contenido]
+            A) [Opción basada en el documento]
+            B) [Opción basada en el documento]
+            C) [Opción basada en el documento]
+            D) [Opción basada en el documento]
+            Respuesta: [Letra correcta]
+
+            [Repetir el formato para las 10 preguntas]
+
+            IMPORTANTE:
+            - Todas las preguntas y respuestas deben basarse en el contenido del documento
+            - Las opciones incorrectas deben ser plausibles pero claramente incorrectas
+            - Cada pregunta debe tener una única respuesta correcta
+            - Las preguntas deben ser claras y sin ambigüedades`;
+        } else {
+            // Mantener el prompt original para temas libres
+            prompt = `Genera un test de opción múltiple sobre "${tema}"...`;
+        }
+
+        const systemPrompt = isDocument ?
+            'Eres un experto en evaluación educativa, especializado en crear tests que evalúan la comprensión profunda de documentos académicos y técnicos.' :
+            'Eres un profesor experto que genera tests educativos adaptados al nivel de dificultad requerido.';
+
         const test = await fetchGroqAPI(prompt, systemPrompt);
-
         res.json({ test });
     } catch (error) {
         console.error('Error en generarTest:', error);
-        res.status(500).json({ 
-            error: error instanceof Error ? error.message : 'Error desconocido',
-            tipo: 'test'
-        });
+        res.status(500).json({ error: error instanceof Error ? error.message : 'Error desconocido' });
     }
 }; 

@@ -30,56 +30,121 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
         generarResumen: async function() {
-            const tema = localStorage.getItem('tema');
-            if (!tema) {
-                alert('Por favor, introduce un tema antes de generar el resumen.');
-                return;
-            }
-            try {
-                const response = await fetch('/api/resumen', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tema })
-                });
-                const data = await response.json();
-                document.getElementById('resumen').innerHTML = `<p>${data.resumen}</p>`;
-                this.showPage('resumen');
-            } catch (error) {
-                console.error('Error al generar el resumen:', error);
-                alert('Hubo un error al generar el resumen: ' + error.message);
+            const isDocumentMode = localStorage.getItem('isDocumentMode') === 'true';
+            const documentContent = localStorage.getItem('currentDocument');
+            const filename = document.getElementById('tema').value;
+
+            if (isDocumentMode) {
+                if (!documentContent) {
+                    alert('No hay ningún documento seleccionado para estudiar.');
+                    return;
+                }
+                try {
+                    const response = await fetch('/api/resumen', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            tema: documentContent,
+                            isDocument: true,
+                            filename: filename
+                        })
+                    });
+                    const data = await response.json();
+                    document.getElementById('resumen').innerHTML = `
+                        <h3>Resumen del documento: ${filename}</h3>
+                        ${data.resumen}
+                    `;
+                    this.showPage('resumen');
+                } catch (error) {
+                    console.error('Error al generar el resumen:', error);
+                    alert('Error al generar el resumen: ' + error.message);
+                }
+            } else {
+                const tema = localStorage.getItem('tema');
+                if (!tema) {
+                    alert('Por favor, introduce un tema antes de generar el resumen.');
+                    return;
+                }
+                try {
+                    const response = await fetch('/api/resumen', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tema })
+                    });
+                    const data = await response.json();
+                    document.getElementById('resumen').innerHTML = `<p>${data.resumen}</p>`;
+                    this.showPage('resumen');
+                } catch (error) {
+                    console.error('Error al generar el resumen:', error);
+                    alert('Error al generar el resumen: ' + error.message);
+                }
             }
         },
         generarTest: async function() {
-            const tema = localStorage.getItem('tema');
-            const dificultad = localStorage.getItem('dificultad');
-            if (!tema || !dificultad) {
-                alert('Por favor, introduce un tema y selecciona una dificultad antes de generar el test.');
-                return;
-            }
-            try {
-                const response = await fetch('/api/test', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tema, dificultad })
-                });
-                const data = await response.json();
-                if (data.error) {
-                    throw new Error(data.error);
+            const isDocumentMode = localStorage.getItem('isDocumentMode') === 'true';
+            const documentContent = localStorage.getItem('currentDocument');
+            const filename = document.getElementById('tema').value;
+
+            if (isDocumentMode) {
+                if (!documentContent) {
+                    alert('No hay ningún documento seleccionado para estudiar.');
+                    return;
                 }
-                if (!data.test) {
-                    throw new Error('No se recibieron datos del test');
+                try {
+                    const response = await fetch('/api/test', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            tema: documentContent,
+                            isDocument: true,
+                            filename: filename
+                        })
+                    });
+                    const data = await response.json();
+                    if (!data.test) {
+                        throw new Error('No se recibieron datos del test');
+                    }
+                    this.preguntas = this.parsearPreguntas(data.test);
+                    this.preguntaActual = 0;
+                    this.respuestasCorrectas = 0;
+                    this.mostrarPregunta();
+                    this.showPage('test');
+                } catch (error) {
+                    console.error('Error al generar el test:', error);
+                    alert('Error al generar el test: ' + error.message);
                 }
-                this.preguntas = this.parsearPreguntas(data.test);
-                if (this.preguntas.length === 0) {
-                    throw new Error('No se pudieron parsear las preguntas del test');
+            } else {
+                const tema = localStorage.getItem('tema');
+                const dificultad = localStorage.getItem('dificultad');
+                if (!tema || !dificultad) {
+                    alert('Por favor, introduce un tema y selecciona una dificultad antes de generar el test.');
+                    return;
                 }
-                this.preguntaActual = 0;
-                this.respuestasCorrectas = 0;
-                this.mostrarPregunta();
-                this.showPage('test');
-            } catch (error) {
-                console.error('Error al generar el test:', error);
-                alert('Hubo un error al generar el test: ' + error.message);
+                try {
+                    const response = await fetch('/api/test', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tema, dificultad })
+                    });
+                    const data = await response.json();
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    if (!data.test) {
+                        throw new Error('No se recibieron datos del test');
+                    }
+                    this.preguntas = this.parsearPreguntas(data.test);
+                    if (this.preguntas.length === 0) {
+                        throw new Error('No se pudieron parsear las preguntas del test');
+                    }
+                    this.preguntaActual = 0;
+                    this.respuestasCorrectas = 0;
+                    this.mostrarPregunta();
+                    this.showPage('test');
+                } catch (error) {
+                    console.error('Error al generar el test:', error);
+                    alert('Hubo un error al generar el test: ' + error.message);
+                }
             }
         },
         parsearPreguntas: function(textoTest) {
@@ -282,51 +347,84 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Actualizar las funciones
                 window.app.generarResumen = async function() {
+                    const documentContent = localStorage.getItem('currentDocument');
+                    const filename = document.getElementById('tema').value;
+
+                    if (!documentContent) {
+                        alert('No hay ningún documento seleccionado para estudiar.');
+                        return;
+                    }
+
                     try {
+                        console.log('Enviando contenido del documento:', documentContent.substring(0, 100) + '...'); // Debug
+
                         const response = await fetch('/api/resumen', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                tema: localStorage.getItem('currentDocument'), // Usar el contenido del documento
+                            body: JSON.stringify({
+                                tema: documentContent,
                                 isDocument: true,
-                                filename: filename // Enviar también el nombre del archivo
+                                filename: filename,
+                                prompt: `Analiza y resume el siguiente documento: ${filename}\n\nContenido del documento:\n${documentContent}`
                             })
                         });
+
+                        if (!response.ok) {
+                            throw new Error(`Error en la petición: ${response.status}`);
+                        }
+
                         const data = await response.json();
                         document.getElementById('resumen').innerHTML = `
-                            <h3>Resumen de: ${filename}</h3>
+                            <h3>Resumen del documento: ${filename}</h3>
                             ${data.resumen}
                         `;
                         this.showPage('resumen');
                     } catch (error) {
-                        console.error('Error al generar el resumen:', error);
-                        alert('Hubo un error al generar el resumen: ' + error.message);
+                        console.error('Error completo al generar el resumen:', error);
+                        alert('Error al generar el resumen. Por favor, intenta de nuevo.');
                     }
                 };
 
                 window.app.generarTest = async function() {
+                    const documentContent = localStorage.getItem('currentDocument');
+                    const filename = document.getElementById('tema').value;
+
+                    if (!documentContent) {
+                        alert('No hay ningún documento seleccionado para estudiar.');
+                        return;
+                    }
+
                     try {
+                        console.log('Enviando contenido del documento para test:', documentContent.substring(0, 100) + '...'); // Debug
+
                         const response = await fetch('/api/test', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                tema: localStorage.getItem('currentDocument'), // Usar el contenido del documento
+                            body: JSON.stringify({
+                                tema: documentContent,
                                 isDocument: true,
-                                filename: filename // Enviar también el nombre del archivo
+                                filename: filename,
+                                prompt: `Genera un test de comprensión sobre este documento: ${filename}\n\nContenido del documento:\n${documentContent}`
                             })
                         });
+
+                        if (!response.ok) {
+                            throw new Error(`Error en la petición: ${response.status}`);
+                        }
+
                         const data = await response.json();
                         if (!data.test) {
                             throw new Error('No se recibieron datos del test');
                         }
+
                         this.preguntas = this.parsearPreguntas(data.test);
                         this.preguntaActual = 0;
                         this.respuestasCorrectas = 0;
                         this.mostrarPregunta();
                         this.showPage('test');
                     } catch (error) {
-                        console.error('Error al generar el test:', error);
-                        alert('Hubo un error al generar el test: ' + error.message);
+                        console.error('Error completo al generar el test:', error);
+                        alert('Error al generar el test. Por favor, intenta de nuevo.');
                     }
                 };
 
