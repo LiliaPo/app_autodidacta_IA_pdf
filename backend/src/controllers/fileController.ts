@@ -1,11 +1,10 @@
-import { Response } from 'express';
-import path from 'path';
-import { FileRequest } from '../types';
+import { Request, Response } from 'express';
 import File from '../models/File';
-import { config } from '../config/config';
 import { UploadedFile } from 'express-fileupload';
+import fs from 'fs/promises';
+import path from 'path';
 
-export const uploadFiles = async (req: FileRequest, res: Response): Promise<void> => {
+export const uploadFiles = async (req: Request, res: Response): Promise<void> => {
     try {
         if (!req.files || Object.keys(req.files).length === 0) {
             res.status(400).json({ message: 'No se subió ningún archivo' });
@@ -17,17 +16,21 @@ export const uploadFiles = async (req: FileRequest, res: Response): Promise<void
         const savedFiles = [];
 
         for (const file of uploadedFiles) {
-            if (!config.allowedMimeTypes.includes(file.mimetype)) continue;
+            // Verificar tipo de archivo
+            if (!file.mimetype.match(/^application\/(pdf|msword|vnd\.openxmlformats|vnd\.ms-excel)|text\/plain/)) {
+                continue;
+            }
 
-            const uploadPath = path.join(config.uploadPath, file.name);
-            await file.mv(uploadPath);
+            // Leer contenido del archivo
+            const content = file.data.toString('utf-8');
 
             const fileDoc = await File.create({
                 filename: file.name,
                 originalName: file.name,
                 mimetype: file.mimetype,
                 size: file.size,
-                path: uploadPath
+                path: path.join(__dirname, '../../uploads', file.name),
+                content: content
             });
 
             savedFiles.push(fileDoc);
@@ -43,5 +46,40 @@ export const uploadFiles = async (req: FileRequest, res: Response): Promise<void
             message: 'Error al subir archivos',
             error: error instanceof Error ? error.message : 'Error desconocido'
         });
+    }
+};
+
+export const getFiles = async (_req: Request, res: Response): Promise<void> => {
+    try {
+        const files = await File.find().select('-content');
+        res.json(files);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener los archivos' });
+    }
+};
+
+export const getFileContent = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const file = await File.findById(req.params.id);
+        if (!file) {
+            res.status(404).json({ error: 'Archivo no encontrado' });
+            return;
+        }
+        res.json({ content: file.content });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener el contenido del archivo' });
+    }
+};
+
+export const deleteFile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const file = await File.findByIdAndDelete(req.params.id);
+        if (!file) {
+            res.status(404).json({ error: 'Archivo no encontrado' });
+            return;
+        }
+        res.json({ message: 'Archivo eliminado correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar el archivo' });
     }
 }; 

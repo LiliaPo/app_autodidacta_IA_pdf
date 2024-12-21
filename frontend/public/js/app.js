@@ -247,4 +247,143 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error al subir los archivos: ' + error.message);
         }
     });
+
+    // Gestión de documentos
+    const documentsListElement = document.getElementById('documents-list');
+
+    // Definir funciones en el scope global
+    window.studyDocument = async function(docId) {
+        try {
+            const response = await fetch(`/api/files/${docId}/content`);
+            if (response.ok) {
+                const { content } = await response.json();
+                
+                // Obtener el nombre del archivo para usarlo como tema
+                const docElement = document.querySelector(`[data-id="${docId}"]`);
+                const filename = docElement.querySelector('span').textContent;
+                
+                // Guardar en localStorage
+                localStorage.setItem('currentDocument', content);
+                localStorage.setItem('currentDocumentId', docId);
+                
+                // Actualizar el campo de tema con el nombre del archivo
+                const temaInput = document.getElementById('tema');
+                temaInput.value = filename;
+                
+                // Actualizar las funciones del app
+                window.app.generarResumen = async function() {
+                    const tema = localStorage.getItem('currentDocument');
+                    if (!tema) {
+                        alert('Por favor, selecciona un documento para estudiar.');
+                        return;
+                    }
+                    try {
+                        const response = await fetch('/api/resumen', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                tema: tema,
+                                dificultad: localStorage.getItem('dificultad') || 'medio'
+                            })
+                        });
+                        const data = await response.json();
+                        document.getElementById('resumen').innerHTML = `<p>${data.resumen}</p>`;
+                        this.showPage('resumen');
+                    } catch (error) {
+                        console.error('Error al generar el resumen:', error);
+                        alert('Hubo un error al generar el resumen: ' + error.message);
+                    }
+                };
+
+                window.app.generarTest = async function() {
+                    const tema = localStorage.getItem('currentDocument');
+                    const dificultad = localStorage.getItem('dificultad');
+                    if (!tema || !dificultad) {
+                        alert('Por favor, selecciona un documento y una dificultad.');
+                        return;
+                    }
+                    try {
+                        const response = await fetch('/api/test', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ tema, dificultad })
+                        });
+                        const data = await response.json();
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        if (!data.test) {
+                            throw new Error('No se recibieron datos del test');
+                        }
+                        this.preguntas = this.parsearPreguntas(data.test);
+                        if (this.preguntas.length === 0) {
+                            throw new Error('No se pudieron parsear las preguntas del test');
+                        }
+                        this.preguntaActual = 0;
+                        this.respuestasCorrectas = 0;
+                        this.mostrarPregunta();
+                        this.showPage('test');
+                    } catch (error) {
+                        console.error('Error al generar el test:', error);
+                        alert('Hubo un error al generar el test: ' + error.message);
+                    }
+                };
+
+                alert('Documento seleccionado para estudio. Ahora puedes generar resúmenes o tests sobre su contenido.');
+            }
+        } catch (error) {
+            console.error('Error al cargar contenido:', error);
+            alert('Error al cargar el documento');
+        }
+    };
+
+    window.deleteDocument = async function(docId) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este documento?')) return;
+
+        try {
+            const response = await fetch(`/api/files/${docId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                // Recargar la lista usando la función del scope global
+                window.loadDocuments();
+                alert('Documento eliminado correctamente');
+            } else {
+                throw new Error('Error al eliminar el documento');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar el documento');
+        }
+    };
+
+    // También mover loadDocuments al scope global
+    window.loadDocuments = async function() {
+        try {
+            const response = await fetch('/api/files');
+            if (response.ok) {
+                const documents = await response.json();
+                const documentsListElement = document.getElementById('documents-list');
+                documentsListElement.innerHTML = documents.map(doc => `
+                    <div class="document-item" data-id="${doc._id}">
+                        <span>${doc.filename}</span>
+                        <div class="document-actions">
+                            <button class="document-button study" onclick="studyDocument('${doc._id}')">
+                                Estudiar
+                            </button>
+                            <button class="document-button delete" onclick="deleteDocument('${doc._id}')">
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Error al cargar documentos:', error);
+        }
+    };
+
+    // Iniciar carga de documentos
+    window.loadDocuments();
 });

@@ -249,4 +249,55 @@ li:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* Contenedor de documentos */
+.documents-container {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.documents-list {
+    margin-top: 10px;
+}
+
+.document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.document-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.document-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.document-button.study {
+    background: linear-gradient(45deg, #7AA2F7, #89B4FF);
+    color: white;
+}
+
+.document-button.delete {
+    background: linear-gradient(45deg, #ff7a7a, #ff8989);
+    color: white;
+}
+
+.document-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
   

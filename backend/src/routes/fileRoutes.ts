@@ -1,14 +1,11 @@
-import { Router, RequestHandler } from 'express';
-import { uploadFiles } from '../controllers/fileController';
+import { Router } from 'express';
+import { uploadFiles, getFiles, getFileContent, deleteFile } from '../controllers/fileController';
 
-// Crear instancia del router
-const router: Router = Router();
+const router = Router();
 
-/**
- * @route   POST /api/files/upload
- * @desc    Sube uno o varios archivos al servidor
- * @access  Public
- */
-router.post('/upload', uploadFiles as RequestHandler);
+router.post('/upload', uploadFiles);
+router.get('/', getFiles);
+router.get('/:id/content', getFileContent);
+router.delete('/:id', deleteFile);
 
 export default router; 
