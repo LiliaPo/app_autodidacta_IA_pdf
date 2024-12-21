@@ -22,6 +22,20 @@
                 <button id="ver-progreso">Ver Progreso</button>
             </div>
         </div>
+        <div class="upload-container">
+            <h3>Subir Documentos</h3>
+            <form id="upload-form" enctype="multipart/form-data">
+                <div class="file-input-wrapper">
+                    <input type="file" id="file-input" multiple 
+                           accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.csv,.ppt,.pptx">
+                    <label for="file-input" class="custom-file-label">
+                        Seleccionar archivos
+                    </label>
+                </div>
+                <div id="file-list" class="file-list"></div>
+                <button type="submit" class="upload-button">Subir Archivos</button>
+            </form>
+        </div>
         <div id="resumen-page" style="display: none;">
             <h2>Resumen</h2>
             <div id="resumen"></div>

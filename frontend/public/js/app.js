@@ -204,4 +204,47 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     app.init();
+
+    // Manejo de archivos
+    const uploadForm = document.getElementById('upload-form');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+
+    fileInput.addEventListener('change', (e) => {
+        fileList.innerHTML = '';
+        Array.from(e.target.files).forEach(file => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+            fileList.appendChild(fileItem);
+        });
+    });
+
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        
+        Array.from(fileInput.files).forEach(file => {
+            formData.append('files', file);
+        });
+
+        try {
+            const response = await fetch('/api/files/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert('Archivos subidos correctamente');
+                fileList.innerHTML = '';
+                fileInput.value = '';
+            } else {
+                throw new Error('Error al subir los archivos');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al subir los archivos: ' + error.message);
+        }
+    });
 });
