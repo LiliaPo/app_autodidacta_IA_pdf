@@ -8,16 +8,39 @@ const xlsx = require('xlsx');
 
 async function extractPdfText(buffer: Buffer): Promise<string> {
     const options = {
-        // No usar render page para evitar problemas de codificación
-        max: 0,
-        version: 'v2.0.550'
+        // Opciones personalizadas para pdf-parse
+        pagerender: function(pageData: any) {
+            // Extraer texto de la página
+            const renderOptions = {
+                normalizeWhitespace: true,
+                disableCombineTextItems: false
+            };
+            return pageData.getTextContent(renderOptions)
+                .then(function(textContent: any) {
+                    let lastY: number | null = null;
+                    let text = '';
+                    
+                    for (const item of textContent.items) {
+                        if (lastY !== item.transform[5]) {
+                            text += '\n';
+                        }
+                        text += item.str;
+                        lastY = item.transform[5];
+                    }
+                    return text;
+                });
+        }
     };
 
     try {
         const data = await pdfParse(buffer, options);
-        return data.text || '';
+        if (!data || typeof data.text !== 'string') {
+            throw new Error('No se pudo extraer texto del PDF');
+        }
+
+        return data.text;
     } catch (error) {
-        console.error('Error extrayendo texto del PDF:', error);
+        console.error('Error detallado al extraer texto del PDF:', error);
         throw new Error('Error al extraer texto del PDF');
     }
 }
