@@ -12,29 +12,22 @@ fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
 
 export const uploadFiles = async (req: Request, res: Response): Promise<void> => {
     try {
-        console.log('Iniciando subida de archivos...');
-        
-        if (!mongoose.connection.readyState) {
-            console.error('MongoDB no está conectado');
-            res.status(500).json({ message: 'Error de conexión a la base de datos' });
-            return;
-        }
-
         if (!req.files || Object.keys(req.files).length === 0) {
-            console.log('No se encontraron archivos');
             res.status(400).json({ message: 'No se subió ningún archivo' });
             return;
         }
 
         const files = req.files.files as UploadedFile | UploadedFile[];
         const uploadedFiles = Array.isArray(files) ? files : [files];
-        console.log(`Procesando ${uploadedFiles.length} archivos`);
-        
         const savedFiles = [];
 
         for (const file of uploadedFiles) {
             try {
-                console.log(`Procesando archivo: ${file.name} (${file.mimetype})`);
+                console.log('Procesando archivo:', {
+                    nombre: file.name,
+                    tipo: file.mimetype,
+                    tamaño: file.size
+                });
 
                 // Verificar tipo de archivo
                 const allowedTypes = [
@@ -49,11 +42,22 @@ export const uploadFiles = async (req: Request, res: Response): Promise<void> =>
                     continue;
                 }
 
-                console.log('Parseando documento...');
+                // Parsear el contenido del documento
+                console.log('Iniciando parseo del documento');
                 const content = await parseDocument(file);
-                console.log('Documento parseado correctamente');
 
-                console.log('Guardando en MongoDB...');
+                // Verificar que el contenido no esté vacío
+                if (!content || content.trim().length === 0) {
+                    console.error('El documento está vacío o no se pudo extraer contenido');
+                    continue;
+                }
+
+                console.log('Contenido extraído:', {
+                    longitud: content.length,
+                    muestra: content.substring(0, 200)
+                });
+
+                // Guardar en MongoDB
                 const fileDoc = await File.create({
                     filename: file.name,
                     originalName: file.name,
@@ -63,10 +67,14 @@ export const uploadFiles = async (req: Request, res: Response): Promise<void> =>
                 });
 
                 savedFiles.push(fileDoc);
-                console.log(`Archivo ${file.name} guardado exitosamente en MongoDB (ID: ${fileDoc._id})`);
+                console.log('Archivo guardado exitosamente:', {
+                    id: fileDoc._id,
+                    nombre: file.name,
+                    contenidoLength: content.length
+                });
 
             } catch (error) {
-                console.error('Error detallado al procesar archivo:', {
+                console.error('Error al procesar archivo:', {
                     archivo: file.name,
                     error: error instanceof Error ? error.stack : error
                 });
@@ -75,21 +83,19 @@ export const uploadFiles = async (req: Request, res: Response): Promise<void> =>
         }
 
         if (savedFiles.length === 0) {
-            console.log('No se pudo procesar ningún archivo');
             res.status(400).json({
                 message: 'Ningún archivo pudo ser procesado',
-                error: 'Verifica el formato y tamaño de los archivos'
+                error: 'Verifica que los archivos tengan contenido válido'
             });
             return;
         }
 
-        console.log(`${savedFiles.length} archivos guardados exitosamente`);
         res.json({
             message: 'Archivos subidos correctamente',
             files: savedFiles
         });
     } catch (error) {
-        console.error('Error completo al subir archivos:', error);
+        console.error('Error al subir archivos:', error);
         res.status(500).json({
             message: 'Error al subir archivos',
             error: error instanceof Error ? error.message : 'Error desconocido'
@@ -113,8 +119,31 @@ export const getFileContent = async (req: Request, res: Response): Promise<void>
             res.status(404).json({ error: 'Archivo no encontrado' });
             return;
         }
-        res.json({ content: file.content });
+
+        // Verificar que tenemos contenido
+        if (!file.content) {
+            res.status(500).json({ error: 'El archivo no tiene contenido' });
+            return;
+        }
+
+        // Log para depuración
+        console.log('Contenido del archivo recuperado:', {
+            id: file._id,
+            filename: file.filename,
+            contentLength: file.content.length,
+            firstLines: file.content.substring(0, 200)
+        });
+
+        res.json({ 
+            content: file.content,
+            metadata: {
+                filename: file.filename,
+                mimetype: file.mimetype,
+                size: file.size
+            }
+        });
     } catch (error) {
+        console.error('Error al obtener contenido del archivo:', error);
         res.status(500).json({ error: 'Error al obtener el contenido del archivo' });
     }
 };

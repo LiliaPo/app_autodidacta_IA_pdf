@@ -16,10 +16,14 @@ app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: path.join(__dirname, '../../temp'),
     createParentPath: true,
+    parseNested: true,
+    debug: true,
     limits: { 
         fileSize: 50 * 1024 * 1024  // 50MB
     },
-    debug: true
+    abortOnLimit: true,
+    safeFileNames: true,
+    preserveExtension: true
 }));
 
 // Rutas API
